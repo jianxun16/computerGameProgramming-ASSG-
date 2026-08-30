@@ -1,0 +1,13 @@
+﻿menu.obj : error LNK2019: unresolved external symbol Direct3DCreate9 referenced in function "bool __cdecl CreateDirectX(void)" (?CreateDirectX@@YA_NXZ)
+menu.obj : error LNK2019: unresolved external symbol D3DXMatrixTransformation2D referenced in function "void __cdecl Render(void)" (?Render@@YAXXZ)
+menu.obj : error LNK2019: unresolved external symbol D3DXCreateSprite referenced in function "void __cdecl InitializeGame(void)" (?InitializeGame@@YAXXZ)
+menu.obj : error LNK2019: unresolved external symbol D3DXCreateTextureFromFileA referenced in function "void __cdecl InitializeGame(void)" (?InitializeGame@@YAXXZ)
+menu.obj : error LNK2019: unresolved external symbol DirectInput8Create referenced in function "void __cdecl CreateDirectInput(void)" (?CreateDirectInput@@YAXXZ)
+menu.obj : error LNK2001: unresolved external symbol IID_IDirectInput8A
+menu.obj : error LNK2001: unresolved external symbol GUID_SysKeyboard
+menu.obj : error LNK2001: unresolved external symbol c_dfDIKeyboard
+C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\lib\x86\d3dx9.lib : warning LNK4272: library machine type 'x86' conflicts with target machine type 'x64'
+C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\lib\x86\d3d9.lib : warning LNK4272: library machine type 'x86' conflicts with target machine type 'x64'
+C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\lib\x86\dinput8.lib : warning LNK4272: library machine type 'x86' conflicts with target machine type 'x64'
+C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\lib\x86\dxguid.lib : warning LNK4272: library machine type 'x86' conflicts with target machine type 'x64'
+C:\Users\User\source\repos\Assignment\x64\Debug\Assignment.exe : fatal error LNK1120: 8 unresolved externals
