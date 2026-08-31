@@ -1,0 +1,14 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "Debug\\pauseMenu.obj",
+            "outputs": [
+                "Debug\\pauseMenu.h.obj.dt.module.json",
+                "Debug\\pauseMenu.h.obj.dt.d.json"
+            ],
+            "requires": []
+        }
+    ]
+}
