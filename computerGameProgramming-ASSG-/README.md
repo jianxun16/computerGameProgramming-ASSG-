@@ -1,2 +1,0 @@
-# computerGameProgramming-ASSG-
-CGP ASSIGNMENT
