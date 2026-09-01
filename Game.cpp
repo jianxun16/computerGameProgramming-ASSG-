@@ -51,10 +51,10 @@ void Game::run()
 {
     while (window.processMessages())
     {
-        inp.update();
-        update();
-        audioManager->updateSound();   // service FMOD + advance BGM fade, once a frame
-        render();
+        inp.update();                  // 1. Input   read keyboard / mouse
+        update();                      // 2. Physics + 3. Update  (collision + game logic)
+        render();                      // 4. Render  draw the frame
+        audioManager->updateSound();   // 5. Sound   service FMOD + advance BGM fade
         applyPending();   // apply any push/pop requested this frame
     }
 }
