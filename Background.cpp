@@ -87,14 +87,8 @@ void Background::render(LPD3DXSPRITE spriteBrush, int screenWidth)
 
 void Background::release()
 {
-    // Explicit releases, no loop.
-    layerTexture[0]->Release();
-    layerTexture[1]->Release();
-    layerTexture[2]->Release();
-    layerTexture[3]->Release();
-
-    layerTexture[0] = NULL;
-    layerTexture[1] = NULL;
-    layerTexture[2] = NULL;
-    layerTexture[3] = NULL;
+    if (layerTexture[0]) { layerTexture[0]->Release(); layerTexture[0] = NULL; }
+    if (layerTexture[1]) { layerTexture[1]->Release(); layerTexture[1] = NULL; }
+    if (layerTexture[2]) { layerTexture[2]->Release(); layerTexture[2] = NULL; }
+    if (layerTexture[3]) { layerTexture[3]->Release(); layerTexture[3] = NULL; }
 }
