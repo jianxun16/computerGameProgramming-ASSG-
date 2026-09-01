@@ -15,7 +15,7 @@ AudioManager::AudioManager()
 
     musicVolume = 1.0f;
     sfxVolume   = 1.0f;
-    fadeLevel   = 0.0f;   // music starts silent until fadeInBGM()
+    fadeLevel   = 0.0f;   // silent until fadeInBGM()
     fadeTarget  = 0.0f;
     fadeRate    = 1.0f;
 }
@@ -24,46 +24,45 @@ AudioManager::~AudioManager()
 {
 }
 
-void AudioManager::initializeAudio()                // Creating the main system object
+void AudioManager::initializeAudio()                // create the FMOD system
 {
     result = FMOD::System_Create(&system);
     result = system->init(32, FMOD_INIT_NORMAL, extradriverdata);
 
-    // One group per audio "channel" so the sliders can control them separately.
+    // One group per audio "channel" for independent volume.
     system->createChannelGroup("BGM", &bgmGroup);
     system->createChannelGroup("SFX", &sfxGroup);
     if (sfxGroup) sfxGroup->setVolume(sfxVolume);
     if (bgmGroup) bgmGroup->setVolume(0.0f);
 
-    // Real-time clock used to make the fade frame-rate independent.
+    // Real-time clock for a frame-rate independent fade.
     QueryPerformanceFrequency(&timerFreq);
     QueryPerformanceCounter(&lastTime);
 }
 
-void AudioManager::loadSounds()                     // Filename, make sure the path is correct
+void AudioManager::loadSounds()                     // check the asset paths
 {
     result = system->createSound("Assets/T3Sahur.wav", FMOD_DEFAULT, 0, &sound1);
-    if (sound1) result = sound1->setMode(FMOD_LOOP_OFF);   // No loop
+    if (sound1) result = sound1->setMode(FMOD_LOOP_OFF);
 
     result = system->createStream("Assets/67.wav", FMOD_DEFAULT, 0, &sound2);
     if (sound2) result = sound2->setMode(FMOD_LOOP_OFF);
 
-    // Short one-shot sound effects (loaded fully into memory, no loop).
+    // One-shot effects.
     result = system->createSound("Assets/SoundEffect/PlayerJump.wav", FMOD_DEFAULT, 0, &jumpSfx);
     if (jumpSfx) result = jumpSfx->setMode(FMOD_LOOP_OFF);
 
     result = system->createSound("Assets/SoundEffect/SwordSlash.wav", FMOD_DEFAULT, 0, &slashSfx);
     if (slashSfx) result = slashSfx->setMode(FMOD_LOOP_OFF);
 
-    // Looping level background music.
+    // Looping level music.
     result = system->createStream("Assets/BGM/Map1BGM.wav", FMOD_LOOP_NORMAL, 0, &map1BGM);
     if (map1BGM) result = map1BGM->setMode(FMOD_LOOP_NORMAL);
 }
 
-void AudioManager::updateSound()                    // Must be called once a frame
+void AudioManager::updateSound()                    // call once a frame
 {
-    // Real seconds since the last call (clamped so a long pause / breakpoint
-    // can't make the fade jump).
+    // Seconds since last call, clamped so a long pause can't jump the fade.
     LARGE_INTEGER now;
     QueryPerformanceCounter(&now);
     float dt = (float)(now.QuadPart - lastTime.QuadPart) / (float)timerFreq.QuadPart;
@@ -71,7 +70,7 @@ void AudioManager::updateSound()                    // Must be called once a fra
     if (dt < 0.0f)   dt = 0.0f;
     if (dt > 0.1f)   dt = 0.1f;
 
-    // Advance the BGM fade toward its target.
+    // Advance the fade toward its target.
     if (fadeLevel < fadeTarget)
     {
         fadeLevel += fadeRate * dt;
@@ -87,11 +86,10 @@ void AudioManager::updateSound()                    // Must be called once a fra
     result = system->update();
 }
 
-void AudioManager::playJump()                       // PlayerJump.wav, through the SFX group
+void AudioManager::playJump()                       // PlayerJump.wav via SFX group
 {
-    // Speed the jump sound up: start it PAUSED, raise the pitch (playback
-    // speed), then unpause so it never plays a moment at normal speed first.
-    // 1.0 = original, higher = faster (and a bit higher pitched). Tweak here.
+    // Start paused, raise pitch, then unpause so it never plays at 1.0 first.
+    // 1.0 = original, higher = faster/higher-pitched.
     const float JUMP_SPEED = 1.6f;
 
     FMOD::Channel* ch = 0;
@@ -104,12 +102,12 @@ void AudioManager::playJump()                       // PlayerJump.wav, through t
     channel = ch;
 }
 
-void AudioManager::playSlash()                      // SwordSlash.wav, through the SFX group
+void AudioManager::playSlash()                      // SwordSlash.wav via SFX group
 {
     result = system->playSound(slashSfx, sfxGroup, false, &channel);
 }
 
-void AudioManager::playSound2()                     // (legacy) 67.wav, through the SFX group
+void AudioManager::playSound2()                     // (legacy) 67.wav via SFX group
 {
     result = system->playSound(sound2, sfxGroup, false, &channel);
 }
@@ -123,9 +121,9 @@ void AudioManager::playMap1BGM()
 {
     if (map1BGM == 0) return;
 
-    // Restart cleanly so re-entering the level doesn't stack channels.
+    // Restart cleanly so re-entering doesn't stack channels.
     if (bgmGroup) bgmGroup->stop();
-    fadeLevel = 0.0f;                 // start silent; fadeInBGM() brings it up
+    fadeLevel = 0.0f;                 // silent; fadeInBGM() brings it up
     result = system->playSound(map1BGM, bgmGroup, false, &bgmChannel);
     applyBGMVolume();
 }

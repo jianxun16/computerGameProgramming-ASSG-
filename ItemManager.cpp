@@ -28,8 +28,8 @@ bool ItemManager::load(IDirect3DDevice9* device)
     D3DXCreateTextureFromFile(device, "Assets/item/mushroom.png", &mushroomTex);
     D3DXCreateTextureFromFile(device, "Assets/item/tomato.png", &tomatoTex);
 
-    // Sit each item on top of the ground (floor top is row 7 = 448).
-    float onFloor = 7 * TileMap::TILE - SIZE;   // 384
+    // Sit each item on the ground (floor top = row 7).
+    float onFloor = 7 * TileMap::TILE - SIZE;
 
     add(TOMATO,   11 * TileMap::TILE, onFloor);   
     add(MUSHROOM, 20 * TileMap::TILE, onFloor);   
@@ -48,7 +48,7 @@ void ItemManager::update(PlayerAnimation* player)
         if (!it.active)
             continue;
 
-        // AABB overlap between the player and this item.
+        // AABB overlap with the player.
         bool hit = !(pr < it.x || pl > it.x + SIZE || pb < it.y || pt > it.y + SIZE);
         if (!hit)
             continue;
@@ -59,12 +59,12 @@ void ItemManager::update(PlayerAnimation* player)
         if (it.type == MUSHROOM)
         {
             s -= 0.5f;
-            if (s < 1.0f) s = 1.0f;      // don't shrink below original
+            if (s < 1.0f) s = 1.0f;      // min original size
         }
         else // TOMATO
         {
             s += 0.5f;
-            if (s > 4.0f) s = 4.0f;      // cap how big it gets
+            if (s > 4.0f) s = 4.0f;      // max size
         }
         player->setScale(s);
     }

@@ -1,0 +1,367 @@
+<mxfile host="app.diagrams.net" agent="ClaudeCode" version="24.0.0">
+  <diagram id="game-class-diagram" name="Class Diagram">
+    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2200" pageHeight="1600" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- ============ NOTE ============ -->
+        <mxCell id="note_main" value="main()&#10;Game game;&#10;game.init();&#10;game.run();" style="shape=note;whiteSpace=wrap;html=1;fontSize=11;align=left;fillColor=#fff2cc;strokeColor=#d6b656;verticalAlign=top;spacingLeft=6;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="180" height="90" as="geometry" />
+        </mxCell>
+
+        <!-- ============ GAME (owner) ============ -->
+        <mxCell id="C_Game" value="Game" style="swimlane;html=1;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="440" y="40" width="260" height="230" as="geometry" />
+        </mxCell>
+        <mxCell id="C_Game_a" value="- window: GameWindow&#10;- gfx: Graphics&#10;- inp: InputManager&#10;- timer: FrameTimer*&#10;- audioManager: AudioManager*&#10;- states: vector&lt;GameState*&gt;&#10;- pending: vector&lt;Pending&gt;" style="text;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;whiteSpace=wrap;overflow=hidden;fillColor=none;" vertex="1" parent="C_Game">
+          <mxGeometry y="26" width="260" height="112" as="geometry" />
+        </mxCell>
+        <mxCell id="C_Game_l" value="" style="line;strokeWidth=1;html=1;" vertex="1" parent="C_Game">
+          <mxGeometry y="138" width="260" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="C_Game_m" value="+ init(): bool&#10;+ run(): void&#10;+ pushState(GameState*) / popState()&#10;+ setRootState(GameState*)&#10;+ graphics() / input() / audio()" style="text;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;whiteSpace=wrap;overflow=hidden;fillColor=none;" vertex="1" parent="C_Game">
+          <mxGeometry y="146" width="260" height="84" as="geometry" />
+        </mxCell>
+
+        <!-- ============ INFRASTRUCTURE (left column) ============ -->
+        <mxCell id="C_GameWindow" value="GameWindow" style="swimlane;html=1;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="40" y="180" width="240" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="C_GameWindow_a" value="- hWnd: HWND&#10;- msg: MSG&#10;- w, h: int" style="text;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;whiteSpace=wrap;overflow=hidden;fillColor=none;" vertex="1" parent="C_GameWindow">
+          <mxGeometry y="26" width="240" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="C_GameWindow_l" value="" style="line;strokeWidth=1;html=1;" vertex="1" parent="C_GameWindow">
+          <mxGeometry y="76" width="240" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="C_GameWindow_m" value="+ create(title, w, h): bool&#10;+ processMessages(): bool&#10;+ handle(): HWND" style="text;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;whiteSpace=wrap;overflow=hidden;fillColor=none;" vertex="1" parent="C_GameWindow">
+          <mxGeometry y="84" width="240" height="36" as="geometry" />
+        </mxCell>
+
+        <mxCell id="C_Graphics" value="Graphics" style="swimlane;html=1;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="40" y="340" width="240" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="C_Graphics_a" value="- d3d9: IDirect3D9*&#10;- d3dDevice: IDirect3DDevice9*&#10;- spriteBrush: LPD3DXSPRITE&#10;- screenWidth, screenHeight: int" style="text;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;whiteSpace=wrap;overflow=hidden;fillColor=none;" vertex="1" parent="C_Graphics">
+          <mxGeometry y="26" width="240" height="64" as="geometry" />
+        </mxCell>
+        <mxCell id="C_Graphics_l" value="" style="line;strokeWidth=1;html=1;" vertex="1" parent="C_Graphics">
+          <mxGeometry y="90" width="240" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="C_Graphics_m" value="+ init(hWnd, w, h): bool&#10;+ beginFrame() / endFrame()&#10;+ device() / sprite()" style="text;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;whiteSpace=wrap;overflow=hidden;fillColor=none;" vertex="1" parent="C_Graphics">
+          <mxGeometry y="98" width="240" height="32" as="geometry" />
+        </mxCell>
+
+        <mxCell id="C_InputManager" value="InputManager" style="swimlane;html=1;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="40" y="510" width="240" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="C_InputManager_a" value="- dInput: LPDIRECTINPUT8&#10;- keyboard: LPDIRECTINPUTDEVICE8&#10;- keys[256], keysPrev[256]: BYTE&#10;- mouseX/YPos: int" style="text;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;whiteSpace=wrap;overflow=hidden;fillColor=none;" vertex="1" parent="C_InputManager">
+          <mxGeometry y="26" width="240" height="64" as="geometry" />
+        </mxCell>
+        <mxCell id="C_InputManager_l" value="" style="line;strokeWidth=1;html=1;" vertex="1" parent="C_InputManager">
+          <mxGeometry y="90" width="240" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="C_InputManager_m" value="+ init(hWnd): bool&#10;+ update() / postUpdate()&#10;+ isKeyDown / isKeyPressed&#10;+ mouseLeftClicked() / mouseX()" style="text;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;whiteSpace=wrap;overflow=hidden;fillColor=none;" vertex="1" parent="C_InputManager">
+          <mxGeometry y="98" width="240" height="42" as="geometry" />
+        </mxCell>
+
+        <mxCell id="C_AudioManager" value="AudioManager" style="swimlane;html=1;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="40" y="690" width="240" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="C_AudioManager_a" value="+ system: FMOD::System*&#10;+ bgmGroup, sfxGroup: ChannelGroup*&#10;+ jumpSfx, slashSfx, map1BGM: Sound*&#10;- musicVolume, sfxVolume, fadeLevel" style="text;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;whiteSpace=wrap;overflow=hidden;fillColor=none;" vertex="1" parent="C_AudioManager">
+          <mxGeometry y="26" width="240" height="64" as="geometry" />
+        </mxCell>
+        <mxCell id="C_AudioManager_l" value="" style="line;strokeWidth=1;html=1;" vertex="1" parent="C_AudioManager">
+          <mxGeometry y="90" width="240" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="C_AudioManager_m" value="+ initializeAudio() / loadSounds()&#10;+ updateSound()&#10;+ playJump() / playSlash()&#10;+ setMusicVolume() / setSFXVolume()&#10;+ fadeInBGM() / fadeOutBGM()" style="text;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;whiteSpace=wrap;overflow=hidden;fillColor=none;" vertex="1" parent="C_AudioManager">
+          <mxGeometry y="98" width="240" height="52" as="geometry" />
+        </mxCell>
+
+        <mxCell id="C_FrameTimer" value="FrameTimer" style="swimlane;html=1;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="40" y="880" width="240" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="C_FrameTimer_a" value="- timer_freq, time_now: LARGE_INTEGER&#10;- Requested_FPS: int&#10;- intervalsPerFrame: float" style="text;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;whiteSpace=wrap;overflow=hidden;fillColor=none;" vertex="1" parent="C_FrameTimer">
+          <mxGeometry y="26" width="240" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="C_FrameTimer_l" value="" style="line;strokeWidth=1;html=1;" vertex="1" parent="C_FrameTimer">
+          <mxGeometry y="76" width="240" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="C_FrameTimer_m" value="+ Init(fps): void&#10;+ FramesToUpdate(): int" style="text;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;whiteSpace=wrap;overflow=hidden;fillColor=none;" vertex="1" parent="C_FrameTimer">
+          <mxGeometry y="84" width="240" height="26" as="geometry" />
+        </mxCell>
+
+        <!-- ============ GAMESTATE (abstract base) ============ -->
+        <mxCell id="C_GameState" value="&lt;&lt;abstract&gt;&gt;&#10;GameState" style="swimlane;html=1;fontStyle=3;align=center;verticalAlign=top;childLayout=stackLayout;startSize=36;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="820" y="40" width="240" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="C_GameState_a" value="# game: Game*" style="text;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;whiteSpace=wrap;overflow=hidden;fillColor=none;" vertex="1" parent="C_GameState">
+          <mxGeometry y="36" width="240" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="C_GameState_l" value="" style="line;strokeWidth=1;html=1;" vertex="1" parent="C_GameState">
+          <mxGeometry y="60" width="240" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="C_GameState_m" value="+ onEnter() / onExit() / onResume()&#10;+ update(InputManager*): void&#10;+ render(Graphics*): void&#10;(all virtual)" style="text;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;whiteSpace=wrap;overflow=hidden;fillColor=none;" vertex="1" parent="C_GameState">
+          <mxGeometry y="68" width="240" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- ============ STATE SUBCLASSES ============ -->
+        <mxCell id="C_MenuState" value="MenuState" style="swimlane;html=1;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="820" y="300" width="240" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="C_MenuState_a" value="- background, buttonTex: Texture&#10;- font, titleFont: ID3DXFont*&#10;- playBtn, settingBtn, exitBtn: Button" style="text;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;whiteSpace=wrap;overflow=hidden;fillColor=none;" vertex="1" parent="C_MenuState">
+          <mxGeometry y="26" width="240" height="52" as="geometry" />
+        </mxCell>
+        <mxCell id="C_MenuState_l" value="" style="line;strokeWidth=1;html=1;" vertex="1" parent="C_MenuState">
+          <mxGeometry y="78" width="240" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="C_MenuState_m" value="+ update() / render() [override]&#10;- layoutButtons() / drawButton()" style="text;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;whiteSpace=wrap;overflow=hidden;fillColor=none;" vertex="1" parent="C_MenuState">
+          <mxGeometry y="86" width="240" height="34" as="geometry" />
+        </mxCell>
+
+        <mxCell id="C_SettingState" value="SettingState" style="swimlane;html=1;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="1120" y="300" width="240" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="C_SettingState_a" value="- bgm, sfx: Slider&#10;- whiteTex, font, titleFont" style="text;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;whiteSpace=wrap;overflow=hidden;fillColor=none;" vertex="1" parent="C_SettingState">
+          <mxGeometry y="26" width="240" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="C_SettingState_l" value="" style="line;strokeWidth=1;html=1;" vertex="1" parent="C_SettingState">
+          <mxGeometry y="66" width="240" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="C_SettingState_m" value="+ update() / render() [override]&#10;- drawSlider() (uses game-&gt;audio())" style="text;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;whiteSpace=wrap;overflow=hidden;fillColor=none;" vertex="1" parent="C_SettingState">
+          <mxGeometry y="74" width="240" height="36" as="geometry" />
+        </mxCell>
+
+        <mxCell id="C_PauseState" value="PauseState" style="swimlane;html=1;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="1120" y="470" width="240" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="C_PauseState_a" value="- bgm, sfx: Slider&#10;- whiteTex, font, titleFont" style="text;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;whiteSpace=wrap;overflow=hidden;fillColor=none;" vertex="1" parent="C_PauseState">
+          <mxGeometry y="26" width="240" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="C_PauseState_l" value="" style="line;strokeWidth=1;html=1;" vertex="1" parent="C_PauseState">
+          <mxGeometry y="66" width="240" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="C_PauseState_m" value="+ update() / render() [override]&#10;- drawSlider() (uses game-&gt;audio())" style="text;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;whiteSpace=wrap;overflow=hidden;fillColor=none;" vertex="1" parent="C_PauseState">
+          <mxGeometry y="74" width="240" height="36" as="geometry" />
+        </mxCell>
+
+        <mxCell id="C_EndState" value="EndState" style="swimlane;html=1;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="1120" y="640" width="240" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="C_EndState_a" value="+ Result { RESULT_WIN, RESULT_LOSE }&#10;- result: Result&#10;- whiteTex, font, titleFont" style="text;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;whiteSpace=wrap;overflow=hidden;fillColor=none;" vertex="1" parent="C_EndState">
+          <mxGeometry y="26" width="240" height="52" as="geometry" />
+        </mxCell>
+        <mxCell id="C_EndState_l" value="" style="line;strokeWidth=1;html=1;" vertex="1" parent="C_EndState">
+          <mxGeometry y="78" width="240" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="C_EndState_m" value="+ update() / render() [override]" style="text;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;whiteSpace=wrap;overflow=hidden;fillColor=none;" vertex="1" parent="C_EndState">
+          <mxGeometry y="86" width="240" height="24" as="geometry" />
+        </mxCell>
+
+        <mxCell id="C_PlayState" value="PlayState" style="swimlane;html=1;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="440" y="360" width="260" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="C_PlayState_a" value="- background: Background*&#10;- tileMap: TileMap*&#10;- items: ItemManager*&#10;- player: PlayerAnimation*&#10;- gameOver, enteredBoss: bool" style="text;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;whiteSpace=wrap;overflow=hidden;fillColor=none;" vertex="1" parent="C_PlayState">
+          <mxGeometry y="26" width="260" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="C_PlayState_l" value="" style="line;strokeWidth=1;html=1;" vertex="1" parent="C_PlayState">
+          <mxGeometry y="106" width="260" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="C_PlayState_m" value="+ update() / render() [override]&#10;- restart()" style="text;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;whiteSpace=wrap;overflow=hidden;fillColor=none;" vertex="1" parent="C_PlayState">
+          <mxGeometry y="114" width="260" height="26" as="geometry" />
+        </mxCell>
+
+        <mxCell id="C_BossState" value="BossState" style="swimlane;html=1;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="440" y="560" width="260" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="C_BossState_a" value="- background: Background*&#10;- tileMap: TileMap*&#10;- player: PlayerAnimation*&#10;- bossTex: Texture ; bossX, bossY: float" style="text;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;whiteSpace=wrap;overflow=hidden;fillColor=none;" vertex="1" parent="C_BossState">
+          <mxGeometry y="26" width="260" height="64" as="geometry" />
+        </mxCell>
+        <mxCell id="C_BossState_l" value="" style="line;strokeWidth=1;html=1;" vertex="1" parent="C_BossState">
+          <mxGeometry y="90" width="260" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="C_BossState_m" value="+ onEnter() / update() / render() [override]" style="text;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;whiteSpace=wrap;overflow=hidden;fillColor=none;" vertex="1" parent="C_BossState">
+          <mxGeometry y="98" width="260" height="32" as="geometry" />
+        </mxCell>
+
+        <!-- ============ GAMEPLAY ENTITIES (right/bottom) ============ -->
+        <mxCell id="C_Background" value="Background" style="swimlane;html=1;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="820" y="820" width="240" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="C_Background_a" value="+ NUM_LAYERS = 4&#10;- layerTexture[4]: Texture&#10;- parallaxFactor[4]: float&#10;- cameraX, scale: float" style="text;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;whiteSpace=wrap;overflow=hidden;fillColor=none;" vertex="1" parent="C_Background">
+          <mxGeometry y="26" width="240" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="C_Background_l" value="" style="line;strokeWidth=1;html=1;" vertex="1" parent="C_Background">
+          <mxGeometry y="86" width="240" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="C_Background_m" value="+ load() / update(deltaX) / render()&#10;- drawLayer(i)" style="text;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;whiteSpace=wrap;overflow=hidden;fillColor=none;" vertex="1" parent="C_Background">
+          <mxGeometry y="94" width="240" height="26" as="geometry" />
+        </mxCell>
+
+        <mxCell id="C_TileMap" value="TileMap" style="swimlane;html=1;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="1120" y="820" width="260" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="C_TileMap_a" value="+ TILE=64, ROWS=9, COLS=28&#10;+ enum { EMPTY, GRASS, ROCK, SPIKE }&#10;- tiles[ROWS][COLS]: int&#10;- grassTex, rockTex, spikeTex: Texture" style="text;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;whiteSpace=wrap;overflow=hidden;fillColor=none;" vertex="1" parent="C_TileMap">
+          <mxGeometry y="26" width="260" height="64" as="geometry" />
+        </mxCell>
+        <mxCell id="C_TileMap_l" value="" style="line;strokeWidth=1;html=1;" vertex="1" parent="C_TileMap">
+          <mxGeometry y="90" width="260" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="C_TileMap_m" value="+ load(device, mapFile) / render()&#10;+ rectSolid() / rectSpike(): bool&#10;+ groundTopYAt(worldX): float" style="text;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;whiteSpace=wrap;overflow=hidden;fillColor=none;" vertex="1" parent="C_TileMap">
+          <mxGeometry y="98" width="260" height="52" as="geometry" />
+        </mxCell>
+
+        <mxCell id="C_ItemManager" value="ItemManager" style="swimlane;html=1;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="1120" y="1010" width="260" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="C_ItemManager_a" value="+ enum Type { MUSHROOM, TOMATO }&#10;- struct Item { type, x, y, active }&#10;- items: vector&lt;Item&gt;&#10;- mushroomTex, tomatoTex: Texture" style="text;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;whiteSpace=wrap;overflow=hidden;fillColor=none;" vertex="1" parent="C_ItemManager">
+          <mxGeometry y="26" width="260" height="64" as="geometry" />
+        </mxCell>
+        <mxCell id="C_ItemManager_l" value="" style="line;strokeWidth=1;html=1;" vertex="1" parent="C_ItemManager">
+          <mxGeometry y="90" width="260" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="C_ItemManager_m" value="+ load() / render(cameraX)&#10;+ update(PlayerAnimation*) / reset()" style="text;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;whiteSpace=wrap;overflow=hidden;fillColor=none;" vertex="1" parent="C_ItemManager">
+          <mxGeometry y="98" width="260" height="32" as="geometry" />
+        </mxCell>
+
+        <mxCell id="C_PlayerAnimation" value="PlayerAnimation" style="swimlane;html=1;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="440" y="820" width="280" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="C_PlayerAnimation_a" value="+ enum State { IDLE, RUN_LEFT, RUN_RIGHT, ATTACK }&#10;- sheet, rangeTexture: Texture&#10;- spritePosition, playerWorldPosition, velocity&#10;- collision: PlayerCollision&#10;- state: State ; scale, groundY: float" style="text;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;whiteSpace=wrap;overflow=hidden;fillColor=none;" vertex="1" parent="C_PlayerAnimation">
+          <mxGeometry y="26" width="280" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="C_PlayerAnimation_l" value="" style="line;strokeWidth=1;html=1;" vertex="1" parent="C_PlayerAnimation">
+          <mxGeometry y="106" width="280" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="C_PlayerAnimation_m" value="+ load(device, w, h): bool&#10;+ update(InputManager*, AudioManager*, TileMap*)&#10;+ render() / respawnToStart()&#10;+ getWorldHitbox() / getAttackCircle()" style="text;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;whiteSpace=wrap;overflow=hidden;fillColor=none;" vertex="1" parent="C_PlayerAnimation">
+          <mxGeometry y="114" width="280" height="66" as="geometry" />
+        </mxCell>
+
+        <mxCell id="C_PlayerCollision" value="PlayerCollision" style="swimlane;html=1;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="440" y="1050" width="280" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="C_PlayerCollision_a" value="- gravity: float&#10;- hitHalfWidth, bodyHeight: float" style="text;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;whiteSpace=wrap;overflow=hidden;fillColor=none;" vertex="1" parent="C_PlayerCollision">
+          <mxGeometry y="26" width="280" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="C_PlayerCollision_l" value="" style="line;strokeWidth=1;html=1;" vertex="1" parent="C_PlayerCollision">
+          <mxGeometry y="66" width="280" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="C_PlayerCollision_m" value="+ resolve(TileMap*, ...): void&#10;+ setGravity() / getHalfWidth(scale)&#10;+ getBodyHeight(scale)" style="text;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;whiteSpace=wrap;overflow=hidden;fillColor=none;" vertex="1" parent="C_PlayerCollision">
+          <mxGeometry y="74" width="280" height="46" as="geometry" />
+        </mxCell>
+
+        <!-- ============ StateManager (helper) ============ -->
+        <mxCell id="C_StateManager" value="StateManager&#10;&lt;&lt;helper&gt;&gt;" style="swimlane;html=1;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;startSize=36;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;fillColor=#f5f5f5;strokeColor=#999999;" vertex="1" parent="1">
+          <mxGeometry x="1560" y="40" width="220" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="C_StateManager_m" value="+ push(GameState*) / pop()&#10;+ update(InputManager*)&#10;+ render(Graphics*) / applyPending()" style="text;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;whiteSpace=wrap;overflow=hidden;fillColor=none;" vertex="1" parent="C_StateManager">
+          <mxGeometry y="36" width="220" height="54" as="geometry" />
+        </mxCell>
+
+        <!-- ============ RELATIONSHIPS ============ -->
+        <!-- Game composition of value members (filled diamond at Game) -->
+        <mxCell id="e_game_window" style="endArrow=none;startArrow=diamondThin;startFill=1;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;" edge="1" parent="1" source="C_Game" target="C_GameWindow">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_game_gfx" style="endArrow=none;startArrow=diamondThin;startFill=1;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;" edge="1" parent="1" source="C_Game" target="C_Graphics">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_game_inp" style="endArrow=none;startArrow=diamondThin;startFill=1;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;" edge="1" parent="1" source="C_Game" target="C_InputManager">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_game_audio" style="endArrow=none;startArrow=diamondThin;startFill=1;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;" edge="1" parent="1" source="C_Game" target="C_AudioManager">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_game_timer" style="endArrow=none;startArrow=diamondThin;startFill=1;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;" edge="1" parent="1" source="C_Game" target="C_FrameTimer">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <!-- Game aggregates the state stack (open diamond) -->
+        <mxCell id="e_game_states" value="states  *" style="endArrow=open;startArrow=diamondThin;startFill=0;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;" edge="1" parent="1" source="C_Game" target="C_GameState">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <!-- GameState back-reference to Game -->
+        <mxCell id="e_state_game" value="game" style="endArrow=open;dashed=1;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;" edge="1" parent="1" source="C_GameState" target="C_Game">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Inheritance: subclasses -> GameState (hollow triangle) -->
+        <mxCell id="e_inh_menu" style="endArrow=block;endFill=0;endSize=14;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;" edge="1" parent="1" source="C_MenuState" target="C_GameState">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_inh_setting" style="endArrow=block;endFill=0;endSize=14;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;" edge="1" parent="1" source="C_SettingState" target="C_GameState">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_inh_pause" style="endArrow=block;endFill=0;endSize=14;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;" edge="1" parent="1" source="C_PauseState" target="C_GameState">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_inh_end" style="endArrow=block;endFill=0;endSize=14;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;" edge="1" parent="1" source="C_EndState" target="C_GameState">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_inh_play" style="endArrow=block;endFill=0;endSize=14;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;" edge="1" parent="1" source="C_PlayState" target="C_GameState">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_inh_boss" style="endArrow=block;endFill=0;endSize=14;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;" edge="1" parent="1" source="C_BossState" target="C_GameState">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- PlayState composition of entities -->
+        <mxCell id="e_play_bg" style="endArrow=none;startArrow=diamondThin;startFill=1;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;" edge="1" parent="1" source="C_PlayState" target="C_Background">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_play_tile" style="endArrow=none;startArrow=diamondThin;startFill=1;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;" edge="1" parent="1" source="C_PlayState" target="C_TileMap">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_play_items" style="endArrow=none;startArrow=diamondThin;startFill=1;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;" edge="1" parent="1" source="C_PlayState" target="C_ItemManager">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_play_player" style="endArrow=none;startArrow=diamondThin;startFill=1;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;" edge="1" parent="1" source="C_PlayState" target="C_PlayerAnimation">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- BossState composition -->
+        <mxCell id="e_boss_bg" style="endArrow=none;startArrow=diamondThin;startFill=1;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;" edge="1" parent="1" source="C_BossState" target="C_Background">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_boss_tile" style="endArrow=none;startArrow=diamondThin;startFill=1;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;" edge="1" parent="1" source="C_BossState" target="C_TileMap">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_boss_player" style="endArrow=none;startArrow=diamondThin;startFill=1;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;" edge="1" parent="1" source="C_BossState" target="C_PlayerAnimation">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- PlayerAnimation composition of PlayerCollision -->
+        <mxCell id="e_player_coll" style="endArrow=none;startArrow=diamondThin;startFill=1;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;" edge="1" parent="1" source="C_PlayerAnimation" target="C_PlayerCollision">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Dependencies (dashed open arrow) -->
+        <mxCell id="e_player_tile" value="&lt;&lt;uses&gt;&gt;" style="endArrow=open;dashed=1;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;fontSize=10;" edge="1" parent="1" source="C_PlayerAnimation" target="C_TileMap">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_player_audio" value="&lt;&lt;uses&gt;&gt;" style="endArrow=open;dashed=1;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;fontSize=10;" edge="1" parent="1" source="C_PlayerAnimation" target="C_AudioManager">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_player_input" value="&lt;&lt;uses&gt;&gt;" style="endArrow=open;dashed=1;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;fontSize=10;" edge="1" parent="1" source="C_PlayerAnimation" target="C_InputManager">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_coll_tile" value="&lt;&lt;uses&gt;&gt;" style="endArrow=open;dashed=1;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;fontSize=10;" edge="1" parent="1" source="C_PlayerCollision" target="C_TileMap">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_items_player" value="&lt;&lt;uses&gt;&gt;" style="endArrow=open;dashed=1;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;fontSize=10;" edge="1" parent="1" source="C_ItemManager" target="C_PlayerAnimation">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_setting_audio" value="&lt;&lt;uses&gt;&gt;" style="endArrow=open;dashed=1;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;fontSize=10;" edge="1" parent="1" source="C_SettingState" target="C_AudioManager">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_pause_audio" value="&lt;&lt;uses&gt;&gt;" style="endArrow=open;dashed=1;html=1;edgeStyle=orthogonalEdgeStyle;rounded=0;fontSize=10;" edge="1" parent="1" source="C_PauseState" target="C_AudioManager">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Legend -->
+        <mxCell id="legend" value="Legend&#10;──▷  inheritance (is-a)&#10;◆──  composition (owns, value/new-delete)&#10;◇──  aggregation (holds pointers)&#10;- - ▷  dependency (uses)" style="shape=note;whiteSpace=wrap;html=1;fontSize=11;align=left;fillColor=#f8cecc;strokeColor=#b85450;verticalAlign=top;spacingLeft=6;" vertex="1" parent="1">
+          <mxGeometry x="1560" y="180" width="300" height="120" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

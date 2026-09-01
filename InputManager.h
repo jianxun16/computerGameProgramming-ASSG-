@@ -7,8 +7,8 @@
 #endif
 #include <dinput.h>
 
-// Owns the DirectInput keyboard and the mouse. Poll once per frame with
-// update(); the rest of the game asks it questions (isKeyDown / mouse).
+// Owns the DirectInput keyboard and mouse. Poll once per frame with update();
+// the rest of the game queries it (isKeyDown / mouse).
 class InputManager
 {
 public:
@@ -16,25 +16,24 @@ public:
     ~InputManager();
 
     bool init(HWND hWnd);
-    void update();                       // poll keyboard + mouse each frame (current state only)
-    void postUpdate();                   // snapshot "previous" AFTER a state consumes input,
-                                         // so key/mouse edges survive frames with no fixed-step tick
+    void update();                       // poll keyboard + mouse (current state)
+    void postUpdate();                   // snapshot "previous" after input is consumed
     void release();
 
     bool isKeyDown(int dik) const;       // DIK_A, DIK_D, DIK_SPACE, ...
-    bool isKeyPressed(int dik) const;    // pressed this frame (edge, for toggles like pause)
+    bool isKeyPressed(int dik) const;    // pressed this frame (edge)
     bool mouseLeftDown() const;          // held this frame
     bool mouseLeftClicked() const;       // pressed this frame (edge)
 
-    int  mouseX() const { return mouseXPos; }   // cursor position inside the window
+    int  mouseX() const { return mouseXPos; }   // cursor pos in the window
     int  mouseY() const { return mouseYPos; }
 
 private:
     LPDIRECTINPUT8        dInput;
     LPDIRECTINPUTDEVICE8  keyboard;
-    HWND                  hwnd;          // to convert screen -> client cursor coords
+    HWND                  hwnd;          // screen -> client conversion
     BYTE                  keys[256];
-    BYTE                  keysPrev[256]; // last frame, for key-edge detection
+    BYTE                  keysPrev[256]; // last frame, for edge detection
     bool                  mouseLeftCur;
     bool                  mouseLeftPrev;
     int                   mouseXPos;

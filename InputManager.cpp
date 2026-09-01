@@ -38,14 +38,12 @@ bool InputManager::init(HWND hWnd)
 
 void InputManager::update()
 {
-    // Read the CURRENT keyboard state. The "previous" snapshot used for edge
-    // detection is taken in postUpdate() (after a state actually consumes input),
-    // NOT here -- otherwise, on frames where the fixed-step loop runs no update
-    // (display FPS > 32), a key/mouse edge would be snapshotted away unseen.
+    // Read the current keyboard state; the "previous" snapshot is taken in
+    // postUpdate() so edges survive frames with no fixed-step tick.
     keyboard->Acquire();
     keyboard->GetDeviceState(sizeof(keys), keys);
 
-    // Mouse left button (current) + cursor position in client-area pixels.
+    // Mouse left button + cursor position (client pixels).
     mouseLeftCur = (GetAsyncKeyState(VK_LBUTTON) & 0x8000) != 0;
 
     POINT p;
@@ -59,8 +57,7 @@ void InputManager::update()
 
 void InputManager::postUpdate()
 {
-    // Called once per consumed simulation step: the current state becomes the
-    // "previous" for the next edge comparison.
+    // Once per consumed step: current becomes "previous" for edge detection.
     memcpy(keysPrev, keys, sizeof(keys));
     mouseLeftPrev = mouseLeftCur;
 }
@@ -87,7 +84,7 @@ bool InputManager::isKeyDown(int dik) const
 
 bool InputManager::isKeyPressed(int dik) const
 {
-    // Down this frame, up last frame = a fresh press (one event per keystroke).
+    // Down now, up last frame = a fresh press.
     return (keys[dik] & 0x80) != 0 && (keysPrev[dik] & 0x80) == 0;
 }
 

@@ -5,9 +5,8 @@
 
 class PlayerAnimation;
 
-// Collectable items placed in the world.
-//   mushroom -> shrink the player   tomato -> grow the player
-// Items live in world coordinates and scroll with the tile map.
+// Collectable items in world coordinates, scrolling with the tile map.
+// mushroom -> shrink the player, tomato -> grow the player.
 class ItemManager
 {
 public:

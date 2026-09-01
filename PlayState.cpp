@@ -12,7 +12,7 @@
 #include "AudioManager.h"
 #include "GameLog.h"
 
-// A tiny 2x2 translucent red texture we stretch over the screen on game over.
+// 2x2 translucent red, stretched over the screen on game over.
 static LPDIRECT3DTEXTURE9 MakeRedOverlay(IDirect3DDevice9* device)
 {
     LPDIRECT3DTEXTURE9 tex = NULL;
@@ -23,7 +23,7 @@ static LPDIRECT3DTEXTURE9 MakeRedOverlay(IDirect3DDevice9* device)
     tex->LockRect(0, &lr, NULL, 0);
     DWORD* px = (DWORD*)lr.pBits;
     for (int i = 0; i < 4; i++)
-        px[i] = D3DCOLOR_ARGB(120, 200, 30, 30);   // semi-transparent red
+        px[i] = D3DCOLOR_ARGB(120, 200, 30, 30);   // translucent red
     tex->UnlockRect(0);
     return tex;
 }
@@ -57,18 +57,17 @@ void PlayState::onEnter()
     player->load(g->device(), g->width(), g->height());
     overlayTex = MakeRedOverlay(g->device());
 
-    // Drop the player onto whatever ground is under the spawn column.
+    // Drop the player onto the ground under the spawn column.
     player->setStartFeet(tileMap->groundTopYAt(player->getFeetWorldX()));
 
-    // Level music fades in as the level begins.
+    // Fade the level music in.
     game->audio()->playMap1BGM();
     game->audio()->fadeInBGM(1.5f);
 }
 
 void PlayState::onResume()
 {
-    // Coming back from the pause menu or the boss room: bring the level music
-    // back up (it was faded out when we walked into the boss room).
+    // Back from pause or the boss room: bring the level music back up.
     game->audio()->fadeInBGM(1.5f);
 }
 
@@ -83,7 +82,7 @@ void PlayState::restart()
 
 void PlayState::update(InputManager* input)
 {
-    // Esc opens the pause menu (freezes the game while it sits on top).
+    // Esc opens the pause menu (freezes the game).
     if (input->isKeyPressed(DIK_ESCAPE))
     {
         GameLog("Player paused the game (Esc)");
@@ -91,30 +90,30 @@ void PlayState::update(InputManager* input)
         return;
     }
 
-    // ----- Game over: the Lose menu is on top now; nothing to do here. -----
+    // Game over: the Lose menu is on top; nothing to do here.
     if (gameOver)
         return;
 
-    // Backspace pops back to the menu (still on the stack underneath).
+    // Backspace pops back to the menu underneath.
     if (input->isKeyDown(DIK_BACK))
     {
         game->popState();
         return;
     }
 
-    // Player moves + collides with the tile map; its movement scrolls the world.
+    // Player moves/collides; its movement scrolls the world.
     float deltaX = player->update(input, game->audio(), tileMap);
     background->update(deltaX);
     items->update(player);
 
-    // Fell into the bottomless pit, or touched a spike -> game over.
+    // Fell into the pit or hit a spike -> game over.
     float hl, ht, hr, hb;
     player->getWorldHitbox(hl, ht, hr, hb);
     bool fell   = player->getFeetY() > TileMap::ROWS * TileMap::TILE;
     bool spiked = tileMap->rectSpike(hl, ht, hr, hb);
     if (fell || spiked)
     {
-        gameOver = true;   // freezes this state; the Lose menu overlay takes over
+        gameOver = true;   // freezes this state; Lose menu takes over
         GameLog(fell ? "Player fell into the pit -> Game Over"
                      : "Player hit a spike -> Game Over");
         game->audio()->stopBGM();
@@ -122,14 +121,13 @@ void PlayState::update(InputManager* input)
         return;
     }
 
-    // Reached the end of the level -> walk into the boss room (push it on top).
-    // Fires once so we don't re-enter every frame while standing at the edge.
+    // Reached the level end -> push the boss room. Fires once (enteredBoss).
     const float LEVEL_END_X = 26.0f * TileMap::TILE;
     if (!enteredBoss && player->getFeetWorldX() >= LEVEL_END_X)
     {
         enteredBoss = true;
         GameLog("Player reached the level end -> entering Boss room");
-        game->audio()->fadeOutBGM(1.0f);   // fade Map1 music out on the way to the next level
+        game->audio()->fadeOutBGM(1.0f);   // fade Map1 music out
         game->pushState(new BossState(game));
     }
 }
@@ -143,7 +141,7 @@ void PlayState::render(Graphics* gfx)
     items->render(gfx->sprite(), cameraX);
     player->render(gfx->sprite());
 
-    // Red tint over the whole screen when the game is over.
+    // Red tint over the screen on game over.
     if (gameOver && overlayTex != NULL)
     {
         D3DXMATRIX scaleM, world, identity;

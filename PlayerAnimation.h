@@ -120,7 +120,7 @@ private:
     float scale;
 
     // Attack range circle, in UNSCALED units (multiplied by `scale` at use).
-    float attackRangeRadius; // radius
+    float attackRangeRadius; // radius is for the circle attack range
     float attackRangeOffset; // distance in front of the character
     float attackRangeUp;     // how far above the feet the circle sits
 };

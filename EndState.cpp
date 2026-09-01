@@ -6,8 +6,7 @@
 #include "MenuState.h"
 #include "GameLog.h"
 
-// A 1x1 white texture we stretch + tint into any coloured rectangle.
-// (Same trick PauseState uses.)
+// 1x1 white texture, tinted per rectangle (same helper as PauseState).
 static LPDIRECT3DTEXTURE9 MakeWhite(IDirect3DDevice9* device)
 {
     LPDIRECT3DTEXTURE9 tex = NULL;
@@ -26,12 +25,12 @@ EndState::EndState(Game* game, Result result) : GameState(game)
     whiteTex  = NULL;
     font      = NULL;
     titleFont = NULL;
-    // Button geometry is laid out in onEnter() once we know the screen size.
+    // Button geometry laid out in onEnter().
 }
 
 EndState::~EndState()
 {
-    // Safety net for the shutdown path (Game::cleanup deletes without onExit).
+    // Safety net if deleted without onExit.
     if (whiteTex)  { whiteTex->Release();  whiteTex  = NULL; }
     if (font)      { font->Release();      font      = NULL; }
     if (titleFont) { titleFont->Release(); titleFont = NULL; }
@@ -53,7 +52,7 @@ void EndState::onEnter()
                    OUT_DEFAULT_PRECIS, ANTIALIASED_QUALITY, DEFAULT_PITCH | FF_DONTCARE,
                    "Arial", &titleFont);
 
-    // Centred panel with the title on top and one button below.
+    // Centred panel: title on top, one button below.
     const float panelW = 440.0f, panelH = 260.0f;
     const float panelX = (W - panelW) / 2.0f;
     const float panelY = (H - panelH) / 2.0f;
@@ -62,7 +61,7 @@ void EndState::onEnter()
     menuW = panelW - inset * 2.0f;
     menuH = 48.0f;
     menuX = panelX + inset;
-    menuY = panelY + panelH - inset - menuH;   // sits near the bottom of the panel
+    menuY = panelY + panelH - inset - menuH;   // near the panel bottom
 }
 
 void EndState::onExit()
@@ -83,20 +82,20 @@ void EndState::update(InputManager* input)
     const int  my      = input->mouseY();
     const bool clicked = input->mouseLeftClicked();
 
-    // Esc or the button both go back to the menu.
+    // Esc or the button go back to the menu.
     if (input->isKeyPressed(DIK_ESCAPE) ||
         (clicked && pointIn(mx, my, menuX, menuY, menuW, menuH)))
     {
         GameLog("Player returned to Menu (game cleared)");
-        game->audio()->stopBGM();                 // silence any leftover music
-        game->setRootState(new MenuState(game));  // clear the game -> menu
+        game->audio()->stopBGM();
+        game->setRootState(new MenuState(game));  // clear game -> menu
         return;
     }
 }
 
 void EndState::drawRect(LPD3DXSPRITE sprite, float x, float y, float w, float h, D3DCOLOR color)
 {
-    D3DXVECTOR2 scaling(w, h);          // 1x1 texture -> w x h pixels
+    D3DXVECTOR2 scaling(w, h);          // 1x1 -> w x h px
     D3DXVECTOR2 trans(x, y);
     D3DXMATRIX m;
     D3DXMatrixTransformation2D(&m, NULL, 0.0f, &scaling, NULL, 0.0f, &trans);
@@ -120,7 +119,7 @@ void EndState::render(Graphics* gfx)
     const D3DCOLOR titleColor = win ? D3DCOLOR_ARGB(255, 120, 220, 140)
                                     : D3DCOLOR_ARGB(255, 220, 90, 90);
 
-    // Dim the frozen scene, then draw the panel.
+    // Dim the frozen scene, then the panel.
     drawRect(sp, 0.0f, 0.0f, W, H, D3DCOLOR_ARGB(160, 0, 0, 0));
     drawRect(sp, panelX, panelY, panelW, panelH, D3DCOLOR_ARGB(235, 28, 32, 46));
 
@@ -131,7 +130,7 @@ void EndState::render(Graphics* gfx)
     drawRect(sp, menuX, menuY, menuW, menuH,
              hovMenu ? D3DCOLOR_ARGB(255, 90, 140, 210) : D3DCOLOR_ARGB(255, 60, 95, 150));
 
-    // Rectangles done -> clear the sprite transform before drawing text.
+    // Clear the sprite transform before drawing text.
     D3DXMATRIX id; D3DXMatrixIdentity(&id); sp->SetTransform(&id);
 
     // ----- Text ----- (drawn through the shared, already-begun sprite)

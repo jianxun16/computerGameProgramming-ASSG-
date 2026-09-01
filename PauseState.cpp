@@ -7,7 +7,7 @@
 #include "GameLog.h"
 #include <cstdio>
 
-// A 1x1 white texture we stretch + tint into any coloured rectangle.
+// 1x1 white texture, tinted per rectangle.
 static LPDIRECT3DTEXTURE9 MakeWhite(IDirect3DDevice9* device)
 {
     LPDIRECT3DTEXTURE9 tex = NULL;
@@ -26,15 +26,14 @@ PauseState::PauseState(Game* game) : GameState(game)
     font      = NULL;
     titleFont = NULL;
 
-    // Geometry is laid out in onEnter() once we know the screen size.
+    // Geometry laid out in onEnter().
     bgm.dragging = false;
     sfx.dragging = false;
 }
 
 PauseState::~PauseState()
 {
-    // Safety net for the shutdown path (Game::cleanup deletes without onExit).
-    // Null-guarded, so it's harmless if onExit already freed these.
+    // Safety net if deleted without onExit; null-guarded.
     if (whiteTex)  { whiteTex->Release();  whiteTex  = NULL; }
     if (font)      { font->Release();      font      = NULL; }
     if (titleFont) { titleFont->Release(); titleFont = NULL; }
@@ -92,14 +91,14 @@ bool PauseState::pointIn(int px, int py, float x, float y, float w, float h)
 
 bool PauseState::nearTrack(int px, int py, const Slider& s)
 {
-    const float grab = 16.0f;   // generous band so the knob is easy to grab
+    const float grab = 16.0f;   // easy-to-grab band
     return px >= s.x - grab && px <= s.x + s.w + grab &&
            py >= s.y - grab && py <= s.y + s.h + grab;
 }
 
 void PauseState::update(InputManager* input)
 {
-    // Esc closes the menu (same as Continue).
+    // Esc = Continue.
     if (input->isKeyPressed(DIK_ESCAPE))
     {
         GameLog("Player resumed the game (Esc)");
@@ -120,7 +119,7 @@ void PauseState::update(InputManager* input)
     }
     else
     {
-        // Grab a slider on the click that lands on its track.
+        // Grab the slider clicked on.
         if (clicked)
         {
             if      (nearTrack(mx, my, bgm)) bgm.dragging = true;
@@ -147,20 +146,20 @@ void PauseState::update(InputManager* input)
         }
     }
 
-    // ----- Buttons (act on the click release-free edge) -----
+    // ----- Buttons -----
     if (clicked)
     {
         if (pointIn(mx, my, continueX, continueY, continueW, continueH))
         {
             GameLog("Player resumed the game (Continue)");
-            game->popState();          // resume the game underneath
+            game->popState();          // resume
             return;
         }
         if (pointIn(mx, my, menuX, menuY, menuW, menuH))
         {
             GameLog("Player returned to Menu (game cleared)");
-            game->audio()->stopBGM();               // silence the level music
-            game->setRootState(new MenuState(game)); // clear the game -> menu
+            game->audio()->stopBGM();
+            game->setRootState(new MenuState(game)); // clear game -> menu
             return;
         }
     }
@@ -168,7 +167,7 @@ void PauseState::update(InputManager* input)
 
 void PauseState::drawRect(LPD3DXSPRITE sprite, float x, float y, float w, float h, D3DCOLOR color)
 {
-    D3DXVECTOR2 scaling(w, h);          // 1x1 texture -> w x h pixels
+    D3DXVECTOR2 scaling(w, h);          // 1x1 -> w x h px
     D3DXVECTOR2 trans(x, y);
     D3DXMATRIX m;
     D3DXMatrixTransformation2D(&m, NULL, 0.0f, &scaling, NULL, 0.0f, &trans);
@@ -198,7 +197,7 @@ void PauseState::render(Graphics* gfx)
     const float panelX = (W - panelW) / 2.0f;
     const float panelY = (H - panelH) / 2.0f;
 
-    // Dim the frozen game, then draw the panel.
+    // Dim the frozen game, then the panel.
     drawRect(sp, 0.0f, 0.0f, W, H, D3DCOLOR_ARGB(150, 0, 0, 0));
     drawRect(sp, panelX, panelY, panelW, panelH, D3DCOLOR_ARGB(235, 28, 32, 46));
 
@@ -216,13 +215,11 @@ void PauseState::render(Graphics* gfx)
     drawRect(sp, menuX, menuY, menuW, menuH,
              hovMenu ? D3DCOLOR_ARGB(255, 200, 90, 90) : D3DCOLOR_ARGB(255, 130, 60, 60));
 
-    // Rectangles done -> clear the sprite transform before drawing text.
+    // Clear the sprite transform before drawing text.
     D3DXMATRIX id; D3DXMatrixIdentity(&id); sp->SetTransform(&id);
 
-    // ----- Text -----
-    // Draw through the SHARED sprite (already Begun with ALPHABLEND in
-    // Graphics::beginFrame). Passing NULL here makes the font spin up its own
-    // sprite nested inside the active batch, and the text never shows.
+    // ----- Text ----- (draw through the shared sprite; NULL would nest a
+    // second batch and the text would not show).
     RECT r;
     auto setR = [&](int l, int t, int rr, int b) { r.left = l; r.top = t; r.right = rr; r.bottom = b; };
 
@@ -247,8 +244,7 @@ void PauseState::render(Graphics* gfx)
 
     // Button labels.
     setR((int)continueX, (int)continueY, (int)(continueX + continueW), (int)(continueY + continueH));
-    font->DrawTextA(sp,"Continue", -1, &r, DT_CENTER | DT_VCENTER | DT_SINGLELINE,
-                    D3DCOLOR_ARGB(255, 255, 255, 255));
+    font->DrawTextA(sp,"Continue", -1, &r, DT_CENTER | DT_VCENTER | DT_SINGLELINE,D3DCOLOR_ARGB(255, 255, 255, 255));
 
     setR((int)menuX, (int)menuY, (int)(menuX + menuW), (int)(menuY + menuH));
     font->DrawTextA(sp,"Back to Menu", -1, &r, DT_CENTER | DT_VCENTER | DT_SINGLELINE,

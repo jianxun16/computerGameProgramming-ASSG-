@@ -4,11 +4,10 @@
 Background::Background()
 {
     sourceSize = 512;
-    scale = 1.85f;      // scale so the forest fills the window
+    scale = 1.85f;      // fill the window
     cameraX = 0.0f;
 
-    // Farther layers scroll slower, nearer layers scroll faster.
-    // Layer 3 is nearest (factor 1.0), so the ground scrolls exactly with steps.
+    // Farther layers scroll slower; layer 3 (1.0) tracks steps exactly.
     parallaxFactor[0] = 0.10f;   // farthest
     parallaxFactor[1] = 0.40f;
     parallaxFactor[2] = 0.80f;
@@ -27,7 +26,7 @@ Background::~Background()
 
 bool Background::load(IDirect3DDevice9* device)
 {
-    // Back -> front (farthest layer first). No loop - each layer loaded explicitly.
+    // Back -> front, each layer loaded explicitly (no loop).
     D3DXCreateTextureFromFile(device, "parallex/parallaxForest4.png", &layerTexture[0]); // farthest
     D3DXCreateTextureFromFile(device, "parallex/parallaxForest3.png", &layerTexture[1]);
     D3DXCreateTextureFromFile(device, "parallex/parallaxForest2.png", &layerTexture[2]);
@@ -37,25 +36,24 @@ bool Background::load(IDirect3DDevice9* device)
 
 void Background::update(float deltaX)
 {
-    // Just accumulate the movement; the looping maths happens in render().
+    // Accumulate movement; looping maths happens in render().
     cameraX += deltaX;
 }
 
 void Background::drawLayer(LPD3DXSPRITE spriteBrush, int i)
 {
-    float tileW = (float)sourceSize;   // one tile is 512 wide (pre-scale)
+    float tileW = (float)sourceSize;   // tile width, pre-scale
 
-    // How far this layer has scrolled, in pre-scale space.
+    // Scroll for this layer, in pre-scale space.
     float scroll = (cameraX * parallaxFactor[i]) / scale;
 
-    // Wrap the scroll into [0, tileW) using only maths (no if):
-    //   fmodf can be negative, so add tileW and fmodf again -> always positive.
+    // Wrap into [0, tileW); double fmodf keeps it positive.
     float wrapped = fmodf(fmodf(scroll, tileW) + tileW, tileW);
 
-    // Left-most tile always sits in (-tileW, 0], so 3 tiles cover the screen.
+    // Left tile in (-tileW, 0], so 3 tiles cover the screen.
     float base = -wrapped;
 
-    // The three looping copies a, b, c - drawn explicitly, no for loop.
+    // Three looping copies, drawn explicitly.
     D3DXVECTOR3 a(base, 0.0f, 0.0f);
     D3DXVECTOR3 b(base + tileW, 0.0f, 0.0f);
     D3DXVECTOR3 c(base + tileW * 2.0f, 0.0f, 0.0f);
@@ -67,19 +65,18 @@ void Background::drawLayer(LPD3DXSPRITE spriteBrush, int i)
 
 void Background::render(LPD3DXSPRITE spriteBrush, int screenWidth)
 {
-    // One scale transform enlarges every layer; tile positions are D3DXVECTOR3
-    // in pre-scale space (screen x = scale * position.x).
+    // One scale transform for every layer (screen x = scale * position.x).
     D3DXMATRIX matScale;
     D3DXMatrixScaling(&matScale, scale, scale, 1.0f);
     spriteBrush->SetTransform(&matScale);
 
-    // Draw back -> front. Each layer drawn explicitly, no for loop.
+    // Draw back -> front, each layer explicitly.
     drawLayer(spriteBrush, 0);
     drawLayer(spriteBrush, 1);
     drawLayer(spriteBrush, 2);
     drawLayer(spriteBrush, 3);
 
-    // Reset the transform so whatever is drawn next is at normal scale/position.
+    // Reset the transform for whatever is drawn next.
     D3DXMATRIX identity;
     D3DXMatrixIdentity(&identity);
     spriteBrush->SetTransform(&identity);

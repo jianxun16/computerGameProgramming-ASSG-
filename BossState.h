@@ -9,9 +9,8 @@ class Background;
 class PlayerAnimation;
 class TileMap;
 
-// The boss room: a closed arena (Map2.txt) the player walks into from the end
-// of PlayState. For now the boss itself is just a STATIC placeholder sprite
-// (67Boss.png) - no health / attacks yet. Backspace pops back to the level.
+// Boss room: a closed arena (Map2.txt) entered from the end of PlayState. The
+// boss is a static placeholder (67Boss.png) for now. Backspace pops back.
 class BossState : public GameState
 {
 public:
@@ -27,8 +26,7 @@ private:
     TileMap*         tileMap;
     PlayerAnimation* player;
 
-    // Static boss placeholder. bossX / bossY are its WORLD position (top-left);
-    // it scrolls with the room like any tile. Tweak them to move the boss.
+    // Static boss placeholder; bossX / bossY are its world position (top-left).
     LPDIRECT3DTEXTURE9 bossTex;
     float bossX;
     float bossY;

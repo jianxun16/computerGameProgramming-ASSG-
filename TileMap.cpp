@@ -22,10 +22,7 @@ bool TileMap::load(IDirect3DDevice9* device, const char* mapFile)
     D3DXCreateTextureFromFile(device, "Assets/mapItem/rock.png", &rockTex);
     D3DXCreateTextureFromFile(device, "Assets/mapItem/spike.png", &spikeTex);
 
-    // The level. 0 = empty, 1 = grass, 2 = rock.  (28 wide, 9 tall)
-    //  - rows 7-8 are the ground
-
-
+    // Load the level grid from the map file (0 empty, 1 grass, 2 rock, 5 spike).
     ifstream file(mapFile);
     if (!file) { MessageBox(NULL, mapFile, "map file not found!", MB_OK); return false; }
 
@@ -43,7 +40,7 @@ bool TileMap::solid(int col, int row) const
 {
     if (col < 0 || col >= COLS || row < 0 || row >= ROWS)
         return false;   // outside the map = open air
-    // Spikes are NOT solid: you walk INTO them (and die), you don't stand on them.
+    // Spikes are NOT solid: you walk into them (and die).
     return tiles[row][col] != EMPTY && tiles[row][col] != SPIKE;
 }
 
@@ -60,21 +57,18 @@ bool TileMap::rectSpike(float left, float top, float right, float bottom) const
             if (c < 0 || c >= COLS || r < 0 || r >= ROWS) continue;
             if (tiles[r][c] != SPIKE) continue;
 
-            // TRIANGLE collision. The spike is a triangle: apex at the top-centre
-            // of the cell (width 0) widening to the base (full width). So only a
-            // real overlap with that triangle counts - the empty top corners of
-            // the cell do NOT kill you.
+            // Triangle collision: apex at the cell's top-centre widening to the
+            // full-width base, so the empty top corners don't kill you.
             float tileTop = (float)(r * TILE);
             float centreX = (float)(c * TILE) + TILE * 0.5f;
 
-            // Test at the deepest point the player reaches in this cell, where the
-            // triangle is widest (best chance of a hit).
+            // Test at the player's deepest point here, where the triangle is widest.
             float y = bottom;
             if (y > tileTop + (float)TILE) y = tileTop + (float)TILE;   // clamp to base
-            float depth = y - tileTop;                 // 0 at the apex .. TILE at the base
-            if (depth <= 0.0f) continue;               // player is above the tip
+            float depth = y - tileTop;                 // 0 at apex .. TILE at base
+            if (depth <= 0.0f) continue;               // above the tip
 
-            float halfW = depth * 0.5f;                // TILE*0.5 at the base (0.5 = base slope)
+            float halfW = depth * 0.5f;                // half-width at this depth
             if (right > centreX - halfW && left < centreX + halfW)
                 return true;
         }
@@ -101,12 +95,12 @@ float TileMap::groundTopYAt(float worldX) const
     for (int r = 0; r < ROWS; r++)
         if (solid(col, r))
             return (float)(r * TILE);
-    return (float)(ROWS * TILE);   // no ground -> bottom of the map
+    return (float)(ROWS * TILE);   // no ground -> map bottom
 }
 
 void TileMap::render(LPD3DXSPRITE spriteBrush, float cameraX, int screenWidth)
 {
-    // Only draw the columns that are on screen.
+    // Only draw on-screen columns.
     int firstCol = (int)(cameraX / TILE);
     int lastCol = (int)((cameraX + screenWidth) / TILE) + 1;
     if (firstCol < 0) firstCol = 0;
@@ -133,7 +127,7 @@ void TileMap::render(LPD3DXSPRITE spriteBrush, float cameraX, int screenWidth)
                 D3DXVECTOR3 pos(sx, sy, 0.0f);
                 spriteBrush->Draw(spikeTex, NULL, NULL, &pos, D3DCOLOR_XRGB(255, 255, 255));
             }
-            else // ROCK (32x32 art scaled up to fill the 64 cell)
+            else // ROCK (32x32 art scaled up to the 64 cell)
             {
                 D3DXMATRIX scaleM, transM, world, identity;
                 D3DXMatrixScaling(&scaleM, 2.0f, 2.0f, 1.0f);

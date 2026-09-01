@@ -37,7 +37,7 @@ void MenuState::onEnter()
     Graphics* g = game->graphics();
     IDirect3DDevice9* dev = g->device();
 
-    // Background + button art (same paths the rest of the game loads from).
+    // Background + button art.
     if (FAILED(D3DXCreateTextureFromFile(dev, "Assets/menu/menu.png", &background)))
         GameLog("MenuState: could not load Assets/menu/menu.png");
     if (FAILED(D3DXCreateTextureFromFile(dev, "Assets/menu/Button1.png", &buttonTex)))
@@ -66,8 +66,8 @@ void MenuState::onExit()
 void MenuState::layoutButtons(float screenW, float screenH)
 {
     const float gap = 26.0f;
-    const float x   = (screenW - btnW) / 2.0f;   // centred horizontally
-    float y = screenH * 0.42f;                    // first button below the title
+    const float x   = (screenW - btnW) / 2.0f;   // centred
+    float y = screenH * 0.42f;                    // first button, below the title
 
     Button* order[3] = { &playBtn, &settingBtn, &exitBtn };
     for (int i = 0; i < 3; i++)
@@ -87,11 +87,11 @@ bool MenuState::pointIn(int px, int py, const RECT& r)
 
 void MenuState::update(InputManager* input)
 {
-    // Enter is a keyboard shortcut for Play.
+    // Enter = Play shortcut.
     if (input->isKeyPressed(DIK_RETURN))
     {
         GameLog("Player clicked Play - starting game (Enter)");
-        game->pushState(new PlayState(game));   // start the game, menu stays underneath
+        game->pushState(new PlayState(game));   // menu stays underneath
         return;
     }
 
@@ -104,17 +104,17 @@ void MenuState::update(InputManager* input)
     if (pointIn(mx, my, playBtn.rect))
     {
         GameLog("Player clicked Play - starting game");
-        game->pushState(new PlayState(game));    // start the game, menu stays underneath
+        game->pushState(new PlayState(game));    // menu stays underneath
     }
     else if (pointIn(mx, my, settingBtn.rect))
     {
         GameLog("Player opened Settings");
-        game->pushState(new SettingState(game)); // settings on top of the menu
+        game->pushState(new SettingState(game)); // settings on top
     }
     else if (pointIn(mx, my, exitBtn.rect))
     {
         GameLog("Player clicked Exit - quitting game");
-        PostQuitMessage(0);                       // ends the message loop -> window closes
+        PostQuitMessage(0);                       // ends the message loop
     }
 }
 
@@ -135,7 +135,7 @@ void MenuState::drawButton(LPD3DXSPRITE sprite, const Button& b, bool hovered)
         D3DXMATRIX m;
         D3DXMatrixTransformation2D(&m, NULL, 0.0f, &scaling, &center, 0.0f, &pos);
         sprite->SetTransform(&m);
-        // Full white when hovered, slightly dimmed otherwise.
+        // White when hovered, dimmed otherwise.
         D3DCOLOR tint = hovered ? D3DCOLOR_XRGB(255, 255, 255) : D3DCOLOR_XRGB(205, 205, 205);
         sprite->Draw(buttonTex, NULL, NULL, NULL, tint);
 
@@ -153,7 +153,7 @@ void MenuState::render(Graphics* gfx)
     const float W = (float)gfx->width();
     const float H = (float)gfx->height();
 
-    // Background stretched to fill the whole window.
+    // Background stretched to fill the window.
     if (background != NULL)
     {
         D3DSURFACE_DESC desc;
@@ -178,7 +178,7 @@ void MenuState::render(Graphics* gfx)
                          DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_NOCLIP,
                          D3DCOLOR_XRGB(255, 240, 90));
 
-    // Buttons, highlighted while the mouse is over them.
+    // Buttons, highlighted on hover.
     int mx = 0, my = 0;
     if (game->input()) { mx = game->input()->mouseX(); my = game->input()->mouseY(); }
 

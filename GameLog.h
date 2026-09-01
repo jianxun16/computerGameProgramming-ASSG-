@@ -2,13 +2,8 @@
 #include <cstdio>
 #include <cstdarg>
 
-// Tiny action logger for the console (CLI) window. main() keeps the console
-// visible; every player action prints one line here so you can watch what the
-// player is doing (move, jump, attack, pause, change volume, ...).
-//
-// Messages are in English on purpose: the default Windows console code page
-// mangles Chinese unless UTF-8 is set up, so plain ASCII stays readable
-// everywhere.
+// Tiny action logger for the console: one line per player action. English/ASCII
+// on purpose, since the default Windows console mangles Chinese without UTF-8.
 inline void GameLog(const char* fmt, ...)
 {
     va_list args;
@@ -17,5 +12,5 @@ inline void GameLog(const char* fmt, ...)
     vprintf(fmt, args);
     printf("\n");
     va_end(args);
-    fflush(stdout);   // show immediately, don't wait for the buffer to fill
+    fflush(stdout);   // show immediately
 }

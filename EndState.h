@@ -3,14 +3,9 @@
 #include <d3d9.h>
 #include <d3dx9.h>
 
-// A full-screen end-of-game overlay pushed on top of gameplay. Two flavours,
-// chosen at construction:
-//   RESULT_WIN  -> "VICTORY"   (green title)
-//   RESULT_LOSE -> "GAME OVER" (red title)
-// Each shows a single "Back to Menu" button that clears the whole state stack
-// back to the MenuState. Like PauseState this is an OVERLAY: because only the
-// TOP of the stack updates, the scene underneath freezes, while render still
-// draws that frozen scene below it (dimmed).
+// Full-screen end-of-game overlay: RESULT_WIN ("VICTORY", green) or RESULT_LOSE
+// ("GAME OVER", red). A single "Back to Menu" button clears the stack back to
+// MenuState. Like PauseState, an overlay that freezes the dimmed scene below.
 class EndState : public GameState
 {
 public:
@@ -33,6 +28,6 @@ private:
     ID3DXFont*         font;        // button label
     ID3DXFont*         titleFont;   // "VICTORY" / "GAME OVER"
 
-    // "Back to Menu" button rectangle (screen pixels).
+    // "Back to Menu" button rect (screen pixels).
     float menuX, menuY, menuW, menuH;
 };

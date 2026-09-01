@@ -7,7 +7,7 @@
 PlayerCollision::PlayerCollision()
 {
     gravity      = 2.0f;
-    hitHalfWidth = 8.0f;   // matches the old inline collision box
+    hitHalfWidth = 8.0f;
     bodyHeight   = 15.0f;
 }
 
@@ -22,12 +22,11 @@ void PlayerCollision::resolve(TileMap* map,
 {
     if (map != NULL)
     {
-        float feetScreenX = spritePos.x + feetCenterX;  // player is fixed here on screen
+        float feetScreenX = spritePos.x + feetCenterX;  // fixed on screen
         float halfW = hitHalfWidth * scale;             // hitbox half width
-        float bodyH = bodyHeight   * scale;             // hitbox height (feet up to head)
+        float bodyH = bodyHeight   * scale;             // hitbox height
 
-        // Horizontal: try to scroll the world; if the body would enter a solid
-        // tile (step side / rock), block it so we don't scroll into it.
+        // Horizontal: scroll the world, but block if the body would enter a solid tile.
         float tryCamX = worldPos.x + velocity.x;
         float feetWX  = feetScreenX + tryCamX;
         float feetY   = spritePos.y + feetYOffset;
@@ -35,7 +34,7 @@ void PlayerCollision::resolve(TileMap* map,
             velocity.x = 0;
         worldPos.x += velocity.x;
 
-        // Vertical: gravity always pulls; then land on a tile top or bonk a tile.
+        // Vertical: gravity pulls, then land on or bonk a tile.
         velocity.y += gravity;
         spritePos.y += velocity.y;
 
@@ -43,7 +42,7 @@ void PlayerCollision::resolve(TileMap* map,
         feetWX = feetScreenX + camX;
         feetY  = spritePos.y + feetYOffset;
 
-        if (velocity.y > 0.0f)   // falling -> stand on the tile top
+        if (velocity.y > 0.0f)   // falling -> stand on a tile top
         {
             if (map->rectSolid(feetWX - halfW, feetY - bodyH, feetWX + halfW, feetY))
             {
@@ -54,10 +53,10 @@ void PlayerCollision::resolve(TileMap* map,
             }
             else
             {
-                isJumping = true;   // walked off a ledge -> now in the air
+                isJumping = true;   // walked off a ledge
             }
         }
-        else if (velocity.y < 0.0f)   // rising -> bonk head on a tile
+        else if (velocity.y < 0.0f)   // rising -> bonk head
         {
             if (map->rectSolid(feetWX - halfW, feetY - bodyH, feetWX + halfW, feetY))
             {
@@ -69,7 +68,7 @@ void PlayerCollision::resolve(TileMap* map,
     }
     else
     {
-        // No tile map -> old flat ground fallback.
+        // No tile map -> flat ground fallback.
         worldPos.x += velocity.x;
         spritePos.y += velocity.y;
         if (spritePos.y >= groundY)

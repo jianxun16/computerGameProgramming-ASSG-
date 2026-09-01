@@ -8,8 +8,8 @@ class GameState;
 class FrameTimer;
 class AudioManager;
 
-// Top-level owner of the whole game: window, graphics, input, audio, timer,
-// and the stack of game states. main() just calls init() then run().
+// Top-level owner: window, graphics, input, audio, timer, and the state stack.
+// main() just calls init() then run().
 class Game
 {
 public:
@@ -20,11 +20,11 @@ public:
     void run();
     void cleanup();
 
-    // State stack. push/pop are deferred until the end of the frame so a state
-    // can safely request a transition from inside its own update().
+    // State stack. push/pop deferred to end of frame, so a state can request a
+    // transition from inside its own update().
     void pushState(GameState* state);
     void popState();
-    void setRootState(GameState* state);   // clear the whole stack, then make this the only state
+    void setRootState(GameState* state);   // clear the stack, make this the only state
 
     // Shared services handed to states.
     Graphics*     graphics() { return &gfx; }

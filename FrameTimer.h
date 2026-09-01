@@ -1,11 +1,9 @@
-#pragma once //include guard,
-#include <Windows.h>//cant inlcude the same inlcude<> in 1 class
+#pragma once
+#include <Windows.h>
 class FrameTimer
 {
-	//FrameTimer.h
-	
 	public:
-		void Init(int fps);//need return type
+		void Init(int fps);
 		int FramesToUpdate();
 	private:
 		LARGE_INTEGER timer_freq;

@@ -8,9 +8,8 @@ class PlayerAnimation;
 class TileMap;
 class ItemManager;
 
-// The actual gameplay: parallax background + tile-map floor + items + the
-// playable warrior. Fall into the bottomless pit and it's game over
-// (press R to restart). Backspace pops back to the menu.
+// Gameplay: parallax background + tile-map floor + items + the playable
+// warrior. Fall into the pit or hit a spike = game over. Backspace pops to menu.
 class PlayState : public GameState
 {
 public:
@@ -31,6 +30,6 @@ private:
     PlayerAnimation* player;
 
     bool               gameOver;
-    bool               enteredBoss;  // true once we've pushed the boss room (fire once)
-    LPDIRECT3DTEXTURE9 overlayTex;   // red tint shown on game over
+    bool               enteredBoss;  // true once the boss room is pushed
+    LPDIRECT3DTEXTURE9 overlayTex;   // red game-over tint
 };

@@ -22,8 +22,7 @@ LRESULT CALLBACK GameWindow::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPA
         PostQuitMessage(0);
         break;
 
-    // NOTE: Esc is the pause key now (handled by the game states via
-    // DirectInput), so it must NOT quit here. Close with the window's X.
+    // NOTE: Esc is the pause key (handled by the states), so don't quit here.
 
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
@@ -46,12 +45,8 @@ bool GameWindow::create(const char* title, int width, int height)
 
     RegisterClass(&wndClass);
 
-    // Size the OUTER window so the CLIENT area is exactly width x height.
-    // Without this, the title bar + borders shrink the client area below the
-    // backbuffer size, and D3D stretches the 800x600 backbuffer to fill it.
-    // Mouse clicks come in client-space while the UI is drawn in backbuffer-
-    // space, so the two drift apart -- worst toward the bottom of the screen,
-    // which throws off button hit-tests (e.g. the Settings "Exit" button).
+    // Size the outer window so the client area is exactly width x height;
+    // otherwise D3D stretches the backbuffer and mouse hit-tests drift off.
     RECT wr = { 0, 0, width, height };
     AdjustWindowRect(&wr, WS_OVERLAPPEDWINDOW, FALSE);
     int winW = wr.right - wr.left;

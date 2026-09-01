@@ -3,14 +3,9 @@
 #include <d3d9.h>
 #include <d3dx9.h>
 
-// A pause overlay pushed on top of the gameplay. Because only the TOP of the
-// state stack updates, pushing this freezes the game underneath (time + world
-// stop), while render still draws the frozen game below it. Contains:
-//   - a Music (BGM) volume slider
-//   - a Sound-effect (SFX) volume slider
-//   - a "Continue" button  -> pops this overlay, resuming the game
-//   - a "Back to Menu" button -> clears the game and returns to the menu
-// Music keeps playing while paused so the sliders can be heard as you drag them.
+// Pause overlay pushed over gameplay: only the top of the stack updates, so the
+// game freezes while still rendered below. Has Music/SFX sliders, a Continue
+// button (pop, resume) and a Back to Menu button (clear game -> menu).
 class PauseState : public GameState
 {
 public:
@@ -34,7 +29,7 @@ private:
     void  drawRect(LPD3DXSPRITE sprite, float x, float y, float w, float h, D3DCOLOR color);
     void  drawSlider(Graphics* gfx, const Slider& s);
     static bool pointIn(int px, int py, float x, float y, float w, float h);
-    static bool nearTrack(int px, int py, const Slider& s);   // generous grab area
+    static bool nearTrack(int px, int py, const Slider& s);   // generous grab
 
     LPDIRECT3DTEXTURE9 whiteTex;   // 1x1 white, tinted per rect
     ID3DXFont*         font;       // labels / buttons
@@ -43,8 +38,7 @@ private:
     Slider bgm;
     Slider sfx;
 
-    // Last volume percentages written to the CLI log, so dragging only prints
-    // a line when the whole-number percentage actually changes.
+    // Last logged volume %, so dragging only logs on a whole-% change.
     int lastMusicPct;
     int lastSfxPct;
 

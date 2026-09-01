@@ -9,9 +9,7 @@
 
 int main()
 {
-    // Keep the console visible: it doubles as a live "action log" (CLI) that
-    // shows what the player is doing (see GameLog). FMOD / DirectX also print
-    // the occasional library message here.
+    // Keep the console visible: it's the live action log (see GameLog).
     ShowWindow(GetConsoleWindow(), SW_SHOW);
     SetConsoleTitleA("Player Action Log");
     printf("=============================\n");
@@ -22,5 +20,5 @@ int main()
     Game game;
     game.init();
     game.run();
-    return 0;   // Game's destructor cleans everything up
+    return 0;   // Game's destructor cleans up
 }

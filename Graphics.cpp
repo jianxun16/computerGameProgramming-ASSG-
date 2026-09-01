@@ -46,7 +46,7 @@ void Graphics::beginFrame()
 {
     d3dDevice->Clear(
         0, NULL, D3DCLEAR_TARGET,
-        D3DCOLOR_XRGB(222, 216, 200),   // soft warm sky so gaps in the layers look natural
+        D3DCOLOR_XRGB(222, 216, 200),   // warm sky, fills layer gaps
         1.0f, 0);
 
     d3dDevice->BeginScene();

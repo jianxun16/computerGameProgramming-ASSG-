@@ -5,10 +5,7 @@
 #include "FrameTimer.h"
 #include "AudioManager.h"
 
-// ----- TEMP SWITCH -----
-// The UI (MenuState) is wired up now, so boot on the menu.
-//   false -> boot straight into the game, skipping the menu
-//   true  -> start on the menu (current)
+// Boot state: true = menu, false = straight into the game.
 static const bool START_IN_MENU = true;
 
 Game::Game()
@@ -37,12 +34,12 @@ bool Game::init()
     audioManager->initializeAudio();
     audioManager->loadSounds();
 
-    // Pick the first state based on the switch above.
+    // First state.
     if (START_IN_MENU)
         pushState(new MenuState(this));
     else
-        pushState(new PlayState(this));   // skip the menu for now
-    applyPending();     // apply the initial push right away
+        pushState(new PlayState(this));
+    applyPending();     // apply the initial push now
 
     return true;
 }
@@ -51,11 +48,11 @@ void Game::run()
 {
     while (window.processMessages())
     {
-        inp.update();                  // 1. Input   read keyboard / mouse
-        update();                      // 2. Physics + 3. Update  (collision + game logic)
-        render();                      // 4. Render  draw the frame
-        audioManager->updateSound();   // 5. Sound   service FMOD + advance BGM fade
-        applyPending();   // apply any push/pop requested this frame
+        inp.update();                  // 1. Input
+        update();                      // 2. Physics + Update
+        render();                      // 3. Render
+        audioManager->updateSound();   // 4. Sound
+        applyPending();   // apply this frame's push/pop
     }
 }
 
@@ -68,8 +65,8 @@ void Game::update()
     {
         if (states.empty())
             break;
-        states.back()->update(&inp);   // only the top of the stack runs
-        inp.postUpdate();              // consume input edges for this step
+        states.back()->update(&inp);   // only the top runs
+        inp.postUpdate();              // consume input edges
     }
 }
 
@@ -77,8 +74,7 @@ void Game::render()
 {
     gfx.beginFrame();
 
-    // Draw bottom -> top so an overlay (e.g. a pause menu) shows the state
-    // beneath it. Empty states simply draw nothing.
+    // Draw bottom -> top so overlays show the state beneath.
     for (size_t i = 0; i < states.size(); i++)
         states[i]->render(&gfx);
 
@@ -99,8 +95,7 @@ void Game::popState()
 
 void Game::setRootState(GameState* state)
 {
-    // Wipe every current state (e.g. "back to menu" clearing the game) and make
-    // `state` the fresh root. Applied at the end of the frame like push/pop.
+    // Wipe the stack and make `state` the fresh root (deferred like push/pop).
     Pending p; p.type = P_CLEAR; p.state = state;
     pending.push_back(p);
 }
@@ -116,7 +111,7 @@ void Game::applyPending()
         }
         else if (pending[i].type == P_CLEAR)
         {
-            // Tear the whole stack down, then install the new root.
+            // Tear down the stack, then install the new root.
             for (size_t s = 0; s < states.size(); s++)
             {
                 states[s]->onExit();
@@ -128,15 +123,13 @@ void Game::applyPending()
         }
         else // P_POP
         {
-            // Never pop the last state (that would leave a blank screen).
-            // e.g. when the menu is switched off, Backspace in PlayState is
-            // ignored instead of emptying the stack.
+            // Never pop the last state (would leave a blank screen).
             if (states.size() > 1)
             {
                 states.back()->onExit();
                 delete states.back();
                 states.pop_back();
-                states.back()->onResume();   // the revealed state is top again
+                states.back()->onResume();   // revealed state is top again
             }
         }
     }
