@@ -1,28 +1,24 @@
 #pragma once
 #define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
+#include <windows.h>
+#include <d3d9.h>
 
-// Owns the Win32 window and its message pump.
-class GameWindow
-{
-public:
-    GameWindow();
-    ~GameWindow();
-
-    bool create(const char* title, int width, int height);
-    bool processMessages();     // pump messages; returns false on WM_QUIT
-    void release();
-
-    HWND handle() const { return hWnd; }
-    int  width()  const { return w; }
-    int  height() const { return h; }
-
+class GameWindow {
 private:
-    static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+    HWND hWnd;
+    HINSTANCE hInstance;
 
-    HWND     hWnd;
-    WNDCLASS wndClass;
-    MSG      msg;
-    int      w;
-    int      h;
+    IDirect3D9* d3d;
+    IDirect3DDevice9* d3dDevice;
+    D3DPRESENT_PARAMETERS d3dPP;
+
+    static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+
+public:
+    bool InitializeWindow(HINSTANCE hInst, int width, int height, bool fullscreen);
+    bool ProcessMessages();
+    void CleanUpWindow();
+
+    HWND GetWindowHandle() const { return hWnd; }
+    IDirect3DDevice9* GetD3DDevice() const { return d3dDevice; }
 };

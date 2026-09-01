@@ -2,16 +2,16 @@
 #include <Windows.h>
 class FrameTimer
 {
-	public:
-		void Init(int fps);
-		int FramesToUpdate();
-	private:
-		LARGE_INTEGER timer_freq;
-		LARGE_INTEGER time_now;
-		LARGE_INTEGER time_previous;
-		int Requested_FPS;
-		float intervalsPerFrame;
-	
-
+public:
+	void Init(int fps);
+	int FrameToUpdate();
+private:
+	LARGE_INTEGER timerFreq;
+	LARGE_INTEGER timeNow;
+	LARGE_INTEGER timePrevious;
+	int requestedFPS;
+	float intervalsPerFrame;
+	float intervalsSinceLastUpdate;
+	int framesToUpdate;
 };
 

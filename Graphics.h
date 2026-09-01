@@ -1,32 +1,24 @@
 #pragma once
-#define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
 #include <d3d9.h>
 #include <d3dx9.h>
+#include <string>
 
-// Owns the Direct3D 9 device and the shared sprite brush. Wraps a frame in
-// beginFrame() / endFrame(); states draw with sprite() in between.
-class Graphics
-{
-public:
-    Graphics();
-    ~Graphics();
+using namespace std;
 
-    bool init(HWND hWnd, int width, int height);
-    void beginFrame();   // Clear + BeginScene + sprite Begin
-    void endFrame();     // sprite End + EndScene + Present
-    void release();
-
-    IDirect3DDevice9* device() const { return d3dDevice; }
-    LPD3DXSPRITE      sprite() const { return spriteBrush; }
-    int               width()  const { return screenWidth; }
-    int               height() const { return screenHeight; }
-
+class Graphics {
 private:
-    IDirect3D9*           d3d9;
-    IDirect3DDevice9*     d3dDevice;
-    LPD3DXSPRITE          spriteBrush;
-    D3DPRESENT_PARAMETERS d3dPP;
-    int                   screenWidth;
-    int                   screenHeight;
+    IDirect3DDevice9* device;
+    LPD3DXSPRITE spriteBrush;
+    LPD3DXLINE lineBrush;
+    LPD3DXFONT fontBrush;
+
+public:
+    bool InitializeGraphics(IDirect3DDevice9* d3dDevice);
+    void CleanUpGraphics();
+
+    LPDIRECT3DTEXTURE9 LoadTexture(string path);
+
+    void BeginRender(int r, int g, int b);
+    void DrawSprite(LPDIRECT3DTEXTURE9 texture, RECT* srcRect, D3DXMATRIX* transform);
+    void EndRender();
 };

@@ -1,24 +1,24 @@
-#include "Game.h"
+#define WIN32_LEAN_AND_MEAN
+#define PI 3.14159
 #include <Windows.h>
-#include <cstdio>
+#include <iostream>
+#include <string>
+#include <d3d9.h>
+#include <d3dx9.h>
+#include <cmath>
+#include <dinput.h>
 
 #pragma comment(lib, "d3d9.lib")
 #pragma comment(lib, "d3dx9.lib")
 #pragma comment(lib, "dinput8.lib")
 #pragma comment(lib, "dxguid.lib")
 
-int main()
-{
-    // Keep the console visible: it's the live action log (see GameLog).
-    ShowWindow(GetConsoleWindow(), SW_SHOW);
-    SetConsoleTitleA("Player Action Log");
-    printf("=============================\n");
-    printf("   Player Action Log (CLI)\n");
-    printf("=============================\n");
-    fflush(stdout);
+using namespace std;
 
-    Game game;
-    game.init();
-    game.run();
-    return 0;   // Game's destructor cleans up
+// Window handle
+HWND g_hWnd = NULL;
+
+int main(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
+	cout << "Game Running...";
+
 }

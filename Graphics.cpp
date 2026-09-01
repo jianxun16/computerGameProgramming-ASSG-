@@ -1,68 +1,60 @@
 #include "Graphics.h"
+#include <iostream>
 
-Graphics::Graphics()
-{
-    d3d9 = NULL;
-    d3dDevice = NULL;
-    spriteBrush = NULL;
-    ZeroMemory(&d3dPP, sizeof(d3dPP));
-    screenWidth = 0;
-    screenHeight = 0;
-}
+bool Graphics::InitializeGraphics(IDirect3DDevice9* d3dDevice) {
+    device = d3dDevice;
 
-Graphics::~Graphics()
-{
-    release();
-}
-
-bool Graphics::init(HWND hWnd, int width, int height)
-{
-    screenWidth = width;
-    screenHeight = height;
-
-    d3d9 = Direct3DCreate9(D3D_SDK_VERSION);
-    if (d3d9 == NULL)
+    if (FAILED(D3DXCreateSprite(device, &spriteBrush))) {
+        cout << "Failed to create sprite brush." << endl;
         return false;
+    }
 
-    ZeroMemory(&d3dPP, sizeof(d3dPP));
-    d3dPP.Windowed = true;
-    d3dPP.SwapEffect = D3DSWAPEFFECT_DISCARD;
-    d3dPP.BackBufferFormat = D3DFMT_X8R8G8B8;
-    d3dPP.BackBufferCount = 1;
-    d3dPP.BackBufferWidth = width;
-    d3dPP.BackBufferHeight = height;
-    d3dPP.hDeviceWindow = hWnd;
-
-    HRESULT hr = d3d9->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd,
-                                    D3DCREATE_SOFTWARE_VERTEXPROCESSING, &d3dPP, &d3dDevice);
-    if (FAILED(hr))
+    if (FAILED(D3DXCreateLine(device, &lineBrush))) {
+        cout << "Failed to create line brush." << endl;
         return false;
+    }
 
-    hr = D3DXCreateSprite(d3dDevice, &spriteBrush);
-    return SUCCEEDED(hr);
+    if (FAILED(D3DXCreateFont(device, 25, 0, 0, 1, false, DEFAULT_CHARSET,
+        OUT_TT_ONLY_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, "Arial", &fontBrush))) {
+        cout << "Failed to create font." << endl;
+        return false;
+    }
+
+    return true;
 }
 
-void Graphics::beginFrame()
-{
-    d3dDevice->Clear(
-        0, NULL, D3DCLEAR_TARGET,
-        D3DCOLOR_XRGB(222, 216, 200),   // warm sky, fills layer gaps
-        1.0f, 0);
+LPDIRECT3DTEXTURE9 Graphics::LoadTexture(string path) {
+    LPDIRECT3DTEXTURE9 texture = NULL;
 
-    d3dDevice->BeginScene();
+    D3DXCreateTextureFromFileEx(device, path.c_str(), D3DX_DEFAULT, D3DX_DEFAULT,
+        D3DX_DEFAULT, NULL, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED,
+        D3DX_DEFAULT, D3DX_DEFAULT, 0,
+        NULL, NULL, &texture);
+
+    return texture;
+}
+
+void Graphics::BeginRender(int r, int g, int b) {
+    device->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(r, g, b), 1.0f, 0);
+    device->BeginScene();
     spriteBrush->Begin(D3DXSPRITE_ALPHABLEND);
 }
 
-void Graphics::endFrame()
-{
-    spriteBrush->End();
-    d3dDevice->EndScene();
-    d3dDevice->Present(NULL, NULL, NULL, NULL);
+void Graphics::DrawSprite(LPDIRECT3DTEXTURE9 texture, RECT* srcRect, D3DXMATRIX* transform) {
+    if (transform) {
+        spriteBrush->SetTransform(transform);
+    }
+    spriteBrush->Draw(texture, srcRect, NULL, NULL, D3DCOLOR_XRGB(255, 255, 255));
 }
 
-void Graphics::release()
-{
-    if (spriteBrush != NULL) { spriteBrush->Release(); spriteBrush = NULL; }
-    if (d3dDevice != NULL)   { d3dDevice->Release();   d3dDevice = NULL; }
-    if (d3d9 != NULL)        { d3d9->Release();        d3d9 = NULL; }
+void Graphics::EndRender() {
+    spriteBrush->End();
+    device->EndScene();
+    device->Present(NULL, NULL, NULL, NULL);
+}
+
+void Graphics::CleanUpGraphics() {
+    if (spriteBrush) { spriteBrush->Release(); spriteBrush = NULL; }
+    if (lineBrush) { lineBrush->Release(); lineBrush = NULL; }
+    if (fontBrush) { fontBrush->Release(); fontBrush = NULL; }
 }
