@@ -46,8 +46,19 @@ bool GameWindow::create(const char* title, int width, int height)
 
     RegisterClass(&wndClass);
 
+    // Size the OUTER window so the CLIENT area is exactly width x height.
+    // Without this, the title bar + borders shrink the client area below the
+    // backbuffer size, and D3D stretches the 800x600 backbuffer to fill it.
+    // Mouse clicks come in client-space while the UI is drawn in backbuffer-
+    // space, so the two drift apart -- worst toward the bottom of the screen,
+    // which throws off button hit-tests (e.g. the Settings "Exit" button).
+    RECT wr = { 0, 0, width, height };
+    AdjustWindowRect(&wr, WS_OVERLAPPEDWINDOW, FALSE);
+    int winW = wr.right - wr.left;
+    int winH = wr.bottom - wr.top;
+
     hWnd = CreateWindowEx(0, wndClass.lpszClassName, title, WS_OVERLAPPEDWINDOW,
-                          0, 100, width, height, NULL, NULL, GetModuleHandle(NULL), NULL);
+                          0, 100, winW, winH, NULL, NULL, GetModuleHandle(NULL), NULL);
     ShowWindow(hWnd, 1);
 
     ZeroMemory(&msg, sizeof(msg));

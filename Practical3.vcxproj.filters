@@ -60,6 +60,9 @@
     <ClCompile Include="PauseState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SettingState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="TileMap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -111,6 +114,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PauseState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SettingState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GameLog.h">

@@ -6,10 +6,10 @@
 #include "AudioManager.h"
 
 // ----- TEMP SWITCH -----
-// The UI (MenuState) is being built by a friend and isn't wired up yet.
-//   false -> boot straight into the game, skipping the menu (current)
-//   true  -> start on the menu  <-- flip this back once the UI is ready
-static const bool START_IN_MENU = false;
+// The UI (MenuState) is wired up now, so boot on the menu.
+//   false -> boot straight into the game, skipping the menu
+//   true  -> start on the menu (current)
+static const bool START_IN_MENU = true;
 
 Game::Game()
 {
