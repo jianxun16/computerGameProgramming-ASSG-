@@ -8,6 +8,7 @@
 #include "PlayerAnimation.h"
 #include "BossState.h"
 #include "PauseState.h"
+#include "EndState.h"
 #include "AudioManager.h"
 #include "GameLog.h"
 
@@ -90,13 +91,9 @@ void PlayState::update(InputManager* input)
         return;
     }
 
-    // ----- Game over: wait for restart, ignore everything else -----
+    // ----- Game over: the Lose menu is on top now; nothing to do here. -----
     if (gameOver)
-    {
-        if (input->isKeyDown(DIK_R))
-            restart();
         return;
-    }
 
     // Backspace pops back to the menu (still on the stack underneath).
     if (input->isKeyDown(DIK_BACK))
@@ -110,15 +107,20 @@ void PlayState::update(InputManager* input)
     background->update(deltaX);
     items->update(player);
 
-    // Fell below the map (into the bottomless pit) -> game over.
-    if (player->getFeetY() > TileMap::ROWS * TileMap::TILE)
-        gameOver = true;
-
-    // Touched a spike -> game over (same as the pit).
+    // Fell into the bottomless pit, or touched a spike -> game over.
     float hl, ht, hr, hb;
     player->getWorldHitbox(hl, ht, hr, hb);
-    if (tileMap->rectSpike(hl, ht, hr, hb))
-        gameOver = true;
+    bool fell   = player->getFeetY() > TileMap::ROWS * TileMap::TILE;
+    bool spiked = tileMap->rectSpike(hl, ht, hr, hb);
+    if (fell || spiked)
+    {
+        gameOver = true;   // freezes this state; the Lose menu overlay takes over
+        GameLog(fell ? "Player fell into the pit -> Game Over"
+                     : "Player hit a spike -> Game Over");
+        game->audio()->stopBGM();
+        game->pushState(new EndState(game, EndState::RESULT_LOSE));
+        return;
+    }
 
     // Reached the end of the level -> walk into the boss room (push it on top).
     // Fires once so we don't re-enter every frame while standing at the edge.

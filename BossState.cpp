@@ -8,6 +8,8 @@
 #include "TileMap.h"
 #include "PlayerAnimation.h"
 #include "PauseState.h"
+#include "EndState.h"
+#include "AudioManager.h"
 #include "GameLog.h"
 
 BossState::BossState(Game* game) : GameState(game)
@@ -66,14 +68,28 @@ void BossState::update(InputManager* input)
     float deltaX = player->update(input, game->audio(), tileMap);
     background->update(deltaX);
 
-    // Touched a spike -> back to the arena entrance. (The shell has no
-    // game-over screen yet; swap this for a real death when the boss is done.)
     float hl, ht, hr, hb;
     player->getWorldHitbox(hl, ht, hr, hb);
+
+    // Touched a spike in the arena -> game over (Lose menu).
     if (tileMap->rectSpike(hl, ht, hr, hb))
     {
-        player->respawnToStart();
-        player->setStartFeet(tileMap->groundTopYAt(player->getFeetWorldX()));
+        GameLog("Player hit a spike in the boss room -> Game Over");
+        game->audio()->stopBGM();
+        game->pushState(new EndState(game, EndState::RESULT_LOSE));
+        return;
+    }
+
+    // Reached the boss -> victory (Win menu).
+    // PLACEHOLDER win condition: for now simply walking up to the boss wins.
+    // When the boss gets real health/attacks, replace this test with a proper
+    // "boss defeated" check (e.g. bossHP <= 0).
+    if (hr >= bossX)
+    {
+        GameLog("Player reached the boss -> Victory");
+        game->audio()->stopBGM();
+        game->pushState(new EndState(game, EndState::RESULT_WIN));
+        return;
     }
 }
 
