@@ -252,7 +252,7 @@ void PlayerAnimation::respawnToStart()
     playerWorldPosition = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
     velocity = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
     isJumping = false;
-    scale = 2.0f;                 // lose any grow/shrink from items
+    scale = 1.0f;                 // lose any grow/shrink from items
     state = STATE_IDLE;
     currentFrame = 0;
     lastFacingLeft = false;

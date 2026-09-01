@@ -31,9 +31,9 @@ bool ItemManager::load(IDirect3DDevice9* device)
     // Sit each item on top of the ground (floor top is row 7 = 448).
     float onFloor = 7 * TileMap::TILE - SIZE;   // 384
 
-    add(TOMATO,   11 * TileMap::TILE, onFloor);   // grow
-    add(MUSHROOM, 20 * TileMap::TILE, onFloor);   // shrink
-    add(TOMATO,   21 * TileMap::TILE, onFloor);   // grow
+    add(TOMATO,   11 * TileMap::TILE, onFloor);   
+    add(MUSHROOM, 20 * TileMap::TILE, onFloor);   
+
     return true;
 }
 
