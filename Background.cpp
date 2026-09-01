@@ -31,7 +31,7 @@ bool Background::load(IDirect3DDevice9* device)
     D3DXCreateTextureFromFile(device, "parallex/parallaxForest4.png", &layerTexture[0]); // farthest
     D3DXCreateTextureFromFile(device, "parallex/parallaxForest3.png", &layerTexture[1]);
     D3DXCreateTextureFromFile(device, "parallex/parallaxForest2.png", &layerTexture[2]);
-    D3DXCreateTextureFromFile(device, "parallex/parallaxForest1.png", &layerTexture[3]); // nearest
+    D3DXCreateTextureFromFile(device, "parallex/parallaxForest1a.png", &layerTexture[3]); // nearest
     return true;
 }
 
