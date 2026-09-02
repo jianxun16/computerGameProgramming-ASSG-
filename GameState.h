@@ -2,20 +2,22 @@
 #include "Graphics.h"
 #include "Input.h"
 
-class StateManager; 
+class GameEngine;   
 
 // abstract class. DO NOT INITIALISE
 class GameState {
 public:
     virtual ~GameState() {}
-    StateManager* stateManager;
 
-    virtual void Initialize(StateManager* manager) { stateManager = manager; }
+    GameEngine* engine;
 
+    virtual void Initialize(GameEngine* eng) { engine = eng; }
+
+    //pause for pushing new item and pausing the one below
     virtual void Pause() {}
     virtual void Resume() {}
 
-    // 0 to make sure it must be extended from
+    // Pure virtual: every state must implement these.
     virtual void UpdateLogic(Input* input, float deltaTime) = 0;
     virtual void RenderFrame(Graphics* graphics) = 0;
 };

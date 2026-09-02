@@ -1,9 +1,9 @@
 #include "Input.h"
 
 Input::Input() {
-    dInput = nullptr;
-    keyboard = nullptr;
-    mouse = nullptr;
+    dInput = NULL;
+    keyboard = NULL;
+    mouse = NULL;
     ZeroMemory(keys, sizeof(keys));
     ZeroMemory(prevKeys, sizeof(prevKeys));
     ZeroMemory(&mouseState, sizeof(mouseState));
@@ -16,10 +16,12 @@ bool Input::InitializeInput(HINSTANCE hInstance, HWND hWnd) {
     dInput->CreateDevice(GUID_SysKeyboard, &keyboard, NULL);
     keyboard->SetDataFormat(&c_dfDIKeyboard);
     keyboard->SetCooperativeLevel(hWnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
+    keyboard->Acquire();  
 
     dInput->CreateDevice(GUID_SysMouse, &mouse, NULL);
     mouse->SetDataFormat(&c_dfDIMouse);
     mouse->SetCooperativeLevel(hWnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
+    mouse->Acquire();   
 
     return true;
 }
@@ -49,15 +51,15 @@ void Input::CleanUpInput() {
     if (keyboard) {
         keyboard->Unacquire();
         keyboard->Release();
-        keyboard = nullptr;
+        keyboard = NULL;
     }
     if (mouse) {
         mouse->Unacquire();
         mouse->Release();
-        mouse = nullptr;
+        mouse = NULL;
     }
     if (dInput) {
         dInput->Release();
-        dInput = nullptr;
+        dInput = NULL;
     }
 }

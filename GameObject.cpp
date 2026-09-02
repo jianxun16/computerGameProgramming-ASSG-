@@ -6,7 +6,7 @@ GameObject::GameObject() {
     rotation = 0.0f;
     spriteWidth = 0;
     spriteHeight = 0;
-    texture = nullptr;
+    texture = NULL;
     isAnimated = false;
     active = true;
 }
@@ -53,9 +53,10 @@ void GameObject::RenderFrame(Graphics* graphics, Camera* camera) {
     // mutiply by cam matrix, so it fits and will change correctly
     D3DXMATRIX finalMatrix = objectMatrix * camera->GetViewMatrix();
 
-    RECT* sourceRect = nullptr;
+    RECT  frameRect;
+    RECT* sourceRect = NULL;
     if (isAnimated) {
-        RECT frameRect = animator.GetSourceRect();
+        frameRect = animator.GetSourceRect();
         sourceRect = &frameRect;
     }
 

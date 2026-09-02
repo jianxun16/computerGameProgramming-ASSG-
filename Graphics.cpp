@@ -40,11 +40,25 @@ void Graphics::BeginRender(int r, int g, int b) {
     spriteBrush->Begin(D3DXSPRITE_ALPHABLEND);
 }
 
-void Graphics::DrawSprite(LPDIRECT3DTEXTURE9 texture, RECT* srcRect, D3DXMATRIX* transform) {
+void Graphics::DrawSprite(LPDIRECT3DTEXTURE9 texture, RECT* srcRect, D3DXMATRIX* transform, D3DCOLOR color) {
     if (transform) {
         spriteBrush->SetTransform(transform);
     }
-    spriteBrush->Draw(texture, srcRect, NULL, NULL, D3DCOLOR_XRGB(255, 255, 255));
+    spriteBrush->Draw(texture, srcRect, NULL, NULL, color);
+}
+
+void Graphics::DrawString(const string& text, RECT rect, D3DCOLOR color, DWORD format) {
+    if (!fontBrush) return;
+    fontBrush->DrawTextA(spriteBrush, text.c_str(), -1, &rect, format, color);
+}
+
+void Graphics::DrawLine(D3DXVECTOR2 from, D3DXVECTOR2 to, float width, D3DCOLOR color) {
+    if (!lineBrush) return;
+    D3DXVECTOR2 pts[2] = { from, to };
+    lineBrush->SetWidth(width);
+    lineBrush->Begin();          // line brush has its own batch
+    lineBrush->Draw(pts, 2, color);
+    lineBrush->End();
 }
 
 void Graphics::EndRender() {
@@ -55,6 +69,6 @@ void Graphics::EndRender() {
 
 void Graphics::CleanUpGraphics() {
     if (spriteBrush) { spriteBrush->Release(); spriteBrush = NULL; }
-    if (lineBrush) { lineBrush->Release(); lineBrush = NULL; }
-    if (fontBrush) { fontBrush->Release(); fontBrush = NULL; }
+    if (lineBrush) { lineBrush->Release();   lineBrush = NULL; }
+    if (fontBrush) { fontBrush->Release();   fontBrush = NULL; }
 }

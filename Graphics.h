@@ -19,6 +19,14 @@ public:
     LPDIRECT3DTEXTURE9 LoadTexture(string path);
 
     void BeginRender(int r, int g, int b);
-    void DrawSprite(LPDIRECT3DTEXTURE9 texture, RECT* srcRect, D3DXMATRIX* transform);
+
+    void DrawSprite(LPDIRECT3DTEXTURE9 texture, RECT* srcRect, D3DXMATRIX* transform,
+        D3DCOLOR color = D3DCOLOR_XRGB(255, 255, 255));
+
+    void DrawString(const string& text, RECT rect, D3DCOLOR color,
+        DWORD format = DT_LEFT | DT_TOP | DT_SINGLELINE);
+
+    void DrawLine(D3DXVECTOR2 from, D3DXVECTOR2 to, float width, D3DCOLOR color);
+
     void EndRender();
 };

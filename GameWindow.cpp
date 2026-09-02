@@ -59,7 +59,8 @@ bool GameWindow::ProcessMessages() {
 }
 
 void GameWindow::CleanUpWindow() {
-    if (d3dDevice) d3dDevice->Release();
-    if (d3d) d3d->Release();
+    if (d3dDevice) { d3dDevice->Release(); d3dDevice = NULL; }
+    if (d3d) { d3d->Release();       d3d = NULL; }
+    if (hWnd) { DestroyWindow(hWnd);  hWnd = NULL; }
     UnregisterClass("OOPWindow", hInstance);
 }

@@ -1,42 +1,60 @@
 #include "StateManager.h"
 
-void StateManager::PushState(GameState* state) {
-    // pause before push
-    if (!stateStack.empty()) {
-        stateStack.back()->Pause();
-    }
+StateManager::StateManager() {
+    engine = NULL;
+}
 
-    // push and point
-    stateStack.push_back(state);
-    stateStack.back()->Initialize(this);
+void StateManager::PushState(GameState* state) {
+    Pending p; p.type = P_PUSH; p.state = state;
+    pending.push_back(p);
 }
 
 void StateManager::PopState() {
-    // destroy top
-    if (!stateStack.empty()) {
-        delete stateStack.back();
-        stateStack.pop_back();
-    }
-
-    // wake top
-    if (!stateStack.empty()) {
-        stateStack.back()->Resume();
-    }
+    Pending p; p.type = P_POP; p.state = NULL;
+    pending.push_back(p);
 }
 
 void StateManager::ChangeState(GameState* state) {
-    // destroy and push
-    if (!stateStack.empty()) {
-        delete stateStack.back();
-        stateStack.pop_back();
-    }
+    Pending p; p.type = P_CHANGE; p.state = state;
+    pending.push_back(p);
+}
 
-    stateStack.push_back(state);
-    stateStack.back()->Initialize(this);
+void StateManager::ApplyPendingTransitions() {
+    for (size_t i = 0; i < pending.size(); i++) {
+        Pending& p = pending[i];
+
+        if (p.type == P_PUSH) {
+            // pause then push
+            if (!stateStack.empty()) {
+                stateStack.back()->Pause();
+            }
+            stateStack.push_back(p.state);
+            stateStack.back()->Initialize(engine);
+        }
+        else if (p.type == P_POP) {
+            // destroy and resume
+            if (!stateStack.empty()) {
+                delete stateStack.back();
+                stateStack.pop_back();
+            }
+            if (!stateStack.empty()) {
+                stateStack.back()->Resume();
+            }
+        }
+        else { // change: pop then push
+            if (!stateStack.empty()) {
+                delete stateStack.back();
+                stateStack.pop_back();
+            }
+            stateStack.push_back(p.state);
+            stateStack.back()->Initialize(engine);
+        }
+    }
+    pending.clear();
 }
 
 GameState* StateManager::GetActiveState() {
-    if (stateStack.empty()) return nullptr;
+    if (stateStack.empty()) return NULL;
     return stateStack.back();
 }
 
@@ -45,4 +63,5 @@ void StateManager::CleanUpStates() {
         delete state;
     }
     stateStack.clear();
+    pending.clear();
 }
