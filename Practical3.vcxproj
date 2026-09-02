@@ -22,6 +22,7 @@
     <ClCompile Include="AnimationController.cpp" />
     <ClCompile Include="AssetManager.cpp" />
     <ClCompile Include="AudioManager.cpp" />
+    <ClCompile Include="Background.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="FrameTimer.cpp" />
     <ClCompile Include="GameEngine.cpp" />
@@ -39,6 +40,7 @@
     <ClInclude Include="AnimationController.h" />
     <ClInclude Include="AssetManager.h" />
     <ClInclude Include="AudioManager.h" />
+    <ClInclude Include="Background.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="FrameTimer.h" />
     <ClInclude Include="GameEngine.h" />
