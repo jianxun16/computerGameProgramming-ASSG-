@@ -11,6 +11,7 @@ private:
     LPD3DXSPRITE spriteBrush;
     LPD3DXLINE lineBrush;
     LPD3DXFONT fontBrush;
+    LPDIRECT3DTEXTURE9 whiteTex;
 
 public:
     bool InitializeGraphics(IDirect3DDevice9* d3dDevice);
@@ -27,6 +28,8 @@ public:
     void DrawString(string text, RECT* rect, DWORD alignment, D3DCOLOR color);
 
     void DrawLine(D3DXVECTOR2 from, D3DXVECTOR2 to, float width, D3DCOLOR color);
+
+    void DrawRect(float x, float y, float w, float h, D3DCOLOR color);
 
     void EndRender();
 };

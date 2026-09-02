@@ -1,11 +1,9 @@
 #include "PauseState.h"
 #include "GameEngine.h"
-// #include "MenuState.h" // For when the player clicks "Back to Menu"
+// #include "MenuState.h"
 
 void PauseState::Initialize(GameEngine* eng) {
     GameState::Initialize(eng);
-
-    uiTex = engine->GetGraphics()->LoadTexture("Assets/menu/ui_box.png");
 
     float W = (float)engine->GetScreenWidth();
     float H = (float)engine->GetScreenHeight();
@@ -17,14 +15,15 @@ void PauseState::Initialize(GameEngine* eng) {
     float trackX = panelX + inset;
     float trackW = panelW - inset * 2.0f;
 
-    // Setup Sliders
+    // Setup BGM Slider
     bgm.x = trackX; bgm.y = panelY + 112.0f; bgm.w = trackW; bgm.h = 12.0f;
     bgm.dragging = false;
-    engine->GetAudio()->GetMusicVolume();
+    bgm.value = engine->GetAudio()->GetMusicVolume(); // Fixed assignment
 
+    // Setup SFX Slider
     sfx.x = trackX; sfx.y = panelY + 182.0f; sfx.w = trackW; sfx.h = 12.0f;
     sfx.dragging = false;
-    engine->GetAudio()->GetSFXVolume();
+    sfx.value = engine->GetAudio()->GetSFXVolume(); // Fixed assignment
 
     continueX = trackX; continueY = panelY + 230.0f; continueW = trackW; continueH = 44.0f;
     menuX = trackX; menuY = panelY + 288.0f; menuW = trackW; menuH = 44.0f;
@@ -40,14 +39,13 @@ bool PauseState::NearTrack(int px, int py, const Slider& s) {
 }
 
 void PauseState::UpdateLogic(Input* input, float deltaTime) {
-    // unpause with esc
     if (input->IsKeyJustPressed(DIK_ESCAPE)) {
         engine->GetStateManager()->PopState();
         return;
     }
 
-    int mx = input->GetMouseDX(); // Assuming these exist in your Input wrapper
-    int my = input->GetMouseDY();
+    int mx = input->GetMouseX();
+    int my = input->GetMouseY();
     bool down = input->IsMouseButtonDown(0);
     bool clicked = input->IsMouseButtonJustPressed(0);
 
@@ -61,13 +59,21 @@ void PauseState::UpdateLogic(Input* input, float deltaTime) {
             else if (NearTrack(mx, my, sfx)) sfx.dragging = true;
         }
 
+        // BGM Logic
         if (bgm.dragging) {
             float v = (mx - bgm.x) / bgm.w;
             if (v < 0.0f) v = 0.0f; if (v > 1.0f) v = 1.0f;
             bgm.value = v;
-            // engine->GetAudio()->SetMusicVolume(v);
+            engine->GetAudio()->SetMusicVolume(v);
         }
-        // ... (Repeat exact same logic for SFX slider)
+
+        // SFX Logic
+        if (sfx.dragging) {
+            float v = (mx - sfx.x) / sfx.w;
+            if (v < 0.0f) v = 0.0f; if (v > 1.0f) v = 1.0f;
+            sfx.value = v;
+            engine->GetAudio()->SetSFXVolume(v);
+        }
     }
 
     if (clicked) {
@@ -75,38 +81,35 @@ void PauseState::UpdateLogic(Input* input, float deltaTime) {
             engine->GetStateManager()->PopState();
         }
         else if (PointInRect(mx, my, menuX, menuY, menuW, menuH)) {
-            // engine->GetAudio()->StopBGM();
-            // engine->GetStateManager()->ChangeState(new MenuState()); // Clears stack and loads menu
+            engine->GetAudio()->StopBGM();
+            // engine->GetStateManager()->ChangeState(new MenuState());
         }
     }
 }
 
-// Stretches your UI texture to form the panels and buttons
-void PauseState::DrawUIBox(Graphics* graphics, float x, float y, float w, float h) {
-    D3DXMATRIX scaleMat, transMat, finalMat;
-
-    // Assuming your UI texture is 10x10 pixels, we scale it to match W and H
-    D3DXMatrixScaling(&scaleMat, w / 10.0f, h / 10.0f, 1.0f);
-    D3DXMatrixTranslation(&transMat, x, y, 0.0f);
-    finalMat = scaleMat * transMat;
-
-    graphics->DrawSprite(uiTex, NULL, &finalMat);
-}
-
 void PauseState::RenderFrame(Graphics* graphics) {
-
-    // panel
     float W = (float)engine->GetScreenWidth();
     float H = (float)engine->GetScreenHeight();
-    DrawUIBox(graphics, (W - 440.0f) / 2.0f, (H - 380.0f) / 2.0f, 440.0f, 380.0f);
 
-    // buttons
-    DrawUIBox(graphics, continueX, continueY, continueW, continueH);
-    DrawUIBox(graphics, menuX, menuY, menuW, menuH);
+    // Dim the screen behind the pause menu
+    graphics->DrawRect(0.0f, 0.0f, W, H, D3DCOLOR_ARGB(150, 0, 0, 0));
 
-    // sliders
-    DrawUIBox(graphics, bgm.x, bgm.y, bgm.w, bgm.h); 
-    DrawUIBox(graphics, bgm.x + (bgm.value * bgm.w) - 7.0f, bgm.y - 6.0f, 14.0f, bgm.h + 12.0f);
+    // Main Panel
+    graphics->DrawRect((W - 440.0f) / 2.0f, (H - 380.0f) / 2.0f, 440.0f, 380.0f, D3DCOLOR_ARGB(235, 28, 32, 46));
 
-    // (Repeat slider drawing for SFX)
+    // Buttons
+    graphics->DrawRect(continueX, continueY, continueW, continueH, D3DCOLOR_ARGB(255, 60, 130, 85));
+    graphics->DrawRect(menuX, menuY, menuW, menuH, D3DCOLOR_ARGB(255, 130, 60, 60));
+
+    // BGM Slider Track & Knob
+    graphics->DrawRect(bgm.x, bgm.y, bgm.w, bgm.h, D3DCOLOR_ARGB(255, 70, 74, 90));
+    graphics->DrawRect(bgm.x, bgm.y, bgm.value * bgm.w, bgm.h, D3DCOLOR_ARGB(255, 90, 200, 120)); // Green fill
+    graphics->DrawRect(bgm.x + (bgm.value * bgm.w) - 7.0f, bgm.y - 6.0f, 14.0f, bgm.h + 12.0f, D3DCOLOR_ARGB(255, 240, 240, 245));
+
+    // SFX Slider Track & Knob
+    graphics->DrawRect(sfx.x, sfx.y, sfx.w, sfx.h, D3DCOLOR_ARGB(255, 70, 74, 90));
+    graphics->DrawRect(sfx.x, sfx.y, sfx.value * sfx.w, sfx.h, D3DCOLOR_ARGB(255, 90, 200, 120)); // Green fill
+    graphics->DrawRect(sfx.x + (sfx.value * sfx.w) - 7.0f, sfx.y - 6.0f, 14.0f, sfx.h + 12.0f, D3DCOLOR_ARGB(255, 240, 240, 245));
+
+    // (Optional: DrawString calls go here to label the buttons and title)
 }

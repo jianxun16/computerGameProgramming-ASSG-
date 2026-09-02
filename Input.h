@@ -13,6 +13,9 @@ private:
     DIMOUSESTATE mouseState;
     DIMOUSESTATE prevMouseState; 
 
+    HWND hWnd;        
+    int mouseX, mouseY;
+
 public:
     Input();
     bool InitializeInput(HINSTANCE hInstance, HWND hWnd);
@@ -24,6 +27,8 @@ public:
     bool IsKeyJustPressed(int dikCode) { return (keys[dikCode] & 0x80) != 0 && (prevKeys[dikCode] & 0x80) == 0; } // press once
 
     // Mouse Checks
+    int GetMouseX() { return mouseX; }
+    int GetMouseY() { return mouseY; }
     long GetMouseDX() const { return mouseState.lX; } 
     long GetMouseDY() const { return mouseState.lY; } 
     bool IsMouseButtonDown(int button) { return (mouseState.rgbButtons[button] & 0x80) != 0; }

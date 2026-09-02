@@ -1,6 +1,5 @@
 #pragma once
 #include "GameState.h"
-#include <d3dx9.h>
 
 class PauseState : public GameState {
 private:
@@ -10,8 +9,6 @@ private:
         bool dragging;
     };
 
-    LPDIRECT3DTEXTURE9 uiTex;
-
     Slider bgm;
     Slider sfx;
 
@@ -20,7 +17,6 @@ private:
 
     bool PointInRect(int px, int py, float x, float y, float w, float h);
     bool NearTrack(int px, int py, const Slider& s);
-    void DrawUIBox(Graphics* graphics, float x, float y, float w, float h);
 
 public:
     void Initialize(GameEngine* eng) override;

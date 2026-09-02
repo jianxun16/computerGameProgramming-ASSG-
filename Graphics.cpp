@@ -20,6 +20,15 @@ bool Graphics::InitializeGraphics(IDirect3DDevice9* d3dDevice) {
         return false;
     }
 
+    if (FAILED(device->CreateTexture(1, 1, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, &whiteTex, NULL))) {
+        cout << "Failed to create UI white texture." << endl;
+        return false;
+    }
+    D3DLOCKED_RECT lr;
+    whiteTex->LockRect(0, &lr, NULL, 0);
+    *(DWORD*)lr.pBits = 0xFFFFFFFF;
+    whiteTex->UnlockRect(0);
+
     return true;
 }
 
@@ -74,6 +83,20 @@ void Graphics::DrawLine(D3DXVECTOR2 from, D3DXVECTOR2 to, float width, D3DCOLOR 
     lineBrush->Begin();          
     lineBrush->Draw(pts, 2, color);
     lineBrush->End();
+}
+
+void Graphics::DrawRect(float x, float y, float w, float h, D3DCOLOR color) {
+    if (!spriteBrush || !whiteTex) return;
+
+    D3DXVECTOR2 scaling(w, h);         
+    D3DXVECTOR2 trans(x, y);
+
+    D3DXMATRIX m;
+    D3DXMatrixTransformation2D(&m, NULL, 0.0f, &scaling, NULL, 0.0f, &trans);
+    spriteBrush->SetTransform(&m);
+
+    D3DXVECTOR3 origin(0.0f, 0.0f, 0.0f);
+    spriteBrush->Draw(whiteTex, NULL, NULL, &origin, color);
 }
 
 void Graphics::EndRender() {

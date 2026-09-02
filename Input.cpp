@@ -8,9 +8,14 @@ Input::Input() {
     ZeroMemory(prevKeys, sizeof(prevKeys));
     ZeroMemory(&mouseState, sizeof(mouseState));
     ZeroMemory(&prevMouseState, sizeof(prevMouseState));
+
+    hWnd = NULL;
+    mouseX = 0;
+    mouseY = 0;
 }
 
-bool Input::InitializeInput(HINSTANCE hInstance, HWND hWnd) {
+bool Input::InitializeInput(HINSTANCE hInstance, HWND windowHandle) {
+    hWnd = windowHandle;
     DirectInput8Create(GetModuleHandle(NULL), 0x0800, IID_IDirectInput8, (void**)&dInput, NULL);
 
     dInput->CreateDevice(GUID_SysKeyboard, &keyboard, NULL);
@@ -44,6 +49,14 @@ void Input::PollDeviceStates() {
         if (hr == DIERR_INPUTLOST || hr == DIERR_NOTACQUIRED) {
             mouse->Acquire();
         }
+    }
+
+    if (hWnd != NULL) {
+        POINT pt;
+        GetCursorPos(&pt);           
+        ScreenToClient(hWnd, &pt);
+        mouseX = pt.x;
+        mouseY = pt.y;
     }
 }
 
