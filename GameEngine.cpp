@@ -17,13 +17,13 @@ bool GameEngine::Initialize(HINSTANCE hInst, int width, int height, bool fullscr
     requestedFPS = fps;
 
     // make window
-    if (!window.InitializeWindow(hInst, width, height, fullscreen)) return false;
+    if (!window.InitializeWindow(GetModuleHandle(NULL), width, height, fullscreen)) return false;
 
     // start graphics
     if (!graphics.InitializeGraphics(window.GetD3DDevice())) return false;
 
     // get Hinstance for input
-    if (!input.InitializeInput(hInst, window.GetWindowHandle())) return false;
+    if (!input.InitializeInput(GetModuleHandle(NULL), window.GetWindowHandle())) return false;
 
     // audio
     audio.InitializeAudio();

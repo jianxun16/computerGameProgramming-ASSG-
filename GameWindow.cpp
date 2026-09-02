@@ -9,7 +9,7 @@ LRESULT CALLBACK GameWindow::WindowProc(HWND hWnd, UINT message, WPARAM wParam, 
 }
 
 bool GameWindow::InitializeWindow(HINSTANCE hInst, int width, int height, bool fullscreen) {
-    hInstance = hInst;
+    hInstance = GetModuleHandle(NULL);
 
     // win32
     WNDCLASS wndClass;

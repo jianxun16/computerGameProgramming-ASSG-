@@ -11,7 +11,7 @@ Input::Input() {
 }
 
 bool Input::InitializeInput(HINSTANCE hInstance, HWND hWnd) {
-    DirectInput8Create(hInstance, 0x0800, IID_IDirectInput8, (void**)&dInput, NULL);
+    DirectInput8Create(GetModuleHandle(NULL), 0x0800, IID_IDirectInput8, (void**)&dInput, NULL);
 
     dInput->CreateDevice(GUID_SysKeyboard, &keyboard, NULL);
     keyboard->SetDataFormat(&c_dfDIKeyboard);
