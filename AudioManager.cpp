@@ -1,31 +1,53 @@
 #include "AudioManager.h"
 
-void AudioManager::InitializeAudio()
-{
-	result = FMOD::System_Create(&system);
-	result = system->init(32, FMOD_INIT_NORMAL, extradrivedata);
+using namespace std;
+
+void AudioManager::InitializeAudio() {
+    result = FMOD::System_Create(&system);
+    result = system->init(32, FMOD_INIT_NORMAL, 0);
+    channel = nullptr;
 }
 
-void AudioManager::PlaySound1()
-{
-	result = system->playSound(sound1, 0, false, &channel);
+void AudioManager::LoadSound(const string& key, const string& filePath, bool isStream) {
+    FMOD::Sound* newSound = nullptr;
+
+    if (isStream) {
+        // Use createStream for background music / large files
+        result = system->createStream(filePath.c_str(), FMOD_DEFAULT, 0, &newSound);
+    }
+    else {
+        // Use createSound for short sound effects (loads fully into memory)
+        result = system->createSound(filePath.c_str(), FMOD_DEFAULT, 0, &newSound);
+    }
+
+    if (newSound) {
+        newSound->setMode(FMOD_LOOP_OFF);
+        soundMap[key] = newSound; // Store it safely in our dictionary map
+    }
 }
 
-void AudioManager::PlaySoundtrack()
-{
-	result = system->playSound(sound2, 0, false, &channel);
+void AudioManager::Play(const string& key) {
+    auto it = soundMap.find(key);
+    if (it != soundMap.end() && it->second != nullptr) {
+        system->playSound(it->second, 0, false, &channel);
+    }
 }
 
-void AudioManager::LoadSounds()
-{
-	result = system->createSound("", FMOD_DEFAULT, 0, &sound1);
-	result = sound1->setMode(FMOD_LOOP_OFF);
-
-	result = system->createStream("", FMOD_DEFAULT, 0, &sound2);
-	result = sound2->setMode(FMOD_LOOP_OFF);
+void AudioManager::UpdateSound() {
+    system->update();
 }
 
-void AudioManager::UpdateSound()
-{
-	result = system->update();
+void AudioManager::CleanUpAudio() {
+    for (auto const& pair : soundMap) {
+        if (pair.second) {
+            pair.second->release();
+        }
+    }
+    soundMap.clear();
+
+    if (system) {
+        system->close();
+        system->release();
+        system = nullptr;
+    }
 }

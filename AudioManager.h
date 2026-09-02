@@ -1,19 +1,24 @@
 #pragma once
 #include "fmod.hpp"
+#include <string>
+#include <unordered_map>
 
-class AudioManager
-{
+using namespace std; 
+
+class AudioManager {
+private:
+    FMOD::System* system;
+    unordered_map<string, FMOD::Sound*> soundMap;
+    FMOD::Channel* channel;
+    FMOD_RESULT result;
+
 public:
-	FMOD::System* system;
-	FMOD::Sound* sound1, * sound2;
-	FMOD::Channel* channel = 0;
-	FMOD_RESULT result;
-	void* extradrivedata = 0;
+    void InitializeAudio();
 
-	void InitializeAudio();
-	void PlaySound1();
-	void PlaySoundtrack();
-	void LoadSounds();
-	void UpdateSound();
-
+    // give name and path
+    void LoadSound(const string& key, const string& filePath, bool isStream = false);
+    // play sound by name
+    void Play(const string& key);
+    void UpdateSound();
+    void CleanUpAudio();
 };

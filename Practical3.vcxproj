@@ -19,23 +19,31 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AnimationController.cpp" />
     <ClCompile Include="AssetManager.cpp" />
     <ClCompile Include="AudioManager.cpp" />
     <ClCompile Include="FrameTimer.cpp" />
+    <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GameWindow.cpp" />
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Physics.cpp" />
+    <ClCompile Include="PhysicsObject.cpp" />
     <ClCompile Include="StateManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AnimationController.h" />
     <ClInclude Include="AssetManager.h" />
     <ClInclude Include="AudioManager.h" />
     <ClInclude Include="FrameTimer.h" />
+    <ClInclude Include="GameObject.h" />
     <ClInclude Include="GameState.h" />
     <ClInclude Include="GameWindow.h" />
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="Input.h" />
+    <ClInclude Include="Physics.h" />
+    <ClInclude Include="PhysicsObject.h" />
     <ClInclude Include="StateManager.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
