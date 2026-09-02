@@ -13,6 +13,7 @@
 using namespace std;
 
 int main(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
+    hInstance = GetModuleHandle(NULL);
     cout << "Game Running..." << endl;
 
     GameEngine engine;
