@@ -2,6 +2,7 @@
 #include "fmod.hpp"
 #include <string>
 #include <unordered_map>
+#pragma comment(lib, "fmod_vc.lib")
 
 using namespace std;
 

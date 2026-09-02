@@ -1,5 +1,7 @@
 #include "GameEngine.h"
+#include <iostream>
 
+using namespace std;
 GameEngine::GameEngine() {
     camera = NULL;
     screenWidth = 0;
@@ -18,25 +20,31 @@ bool GameEngine::Initialize(HINSTANCE hInst, int width, int height, bool fullscr
 
     // make window
     if (!window.InitializeWindow(GetModuleHandle(NULL), width, height, fullscreen)) return false;
+    cout << "initalizing window..\n";
 
     // start graphics
     if (!graphics.InitializeGraphics(window.GetD3DDevice())) return false;
+    cout << "initalizing graphics..\n";
 
     // get Hinstance for input
     if (!input.InitializeInput(GetModuleHandle(NULL), window.GetWindowHandle())) return false;
+    cout << "initalizing input..\n";
 
     // audio
     audio.InitializeAudio();
+    cout << "initalizing audio..\n";
 
     // frame timer
     timer.Init(fps);
+    cout << "initalizing timer..\n";
 
     // cam
     camera = new Camera(width, height);
+    cout << "initalizing camera..\n";
 
     // set stateManager
     stateManager.SetEngine(this);
-
+    cout << "setting engine..\n";
     return true;
 }
 

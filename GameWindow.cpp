@@ -1,4 +1,7 @@
 #include "GameWindow.h"
+#include <iostream>
+
+using namespace std;
 
 LRESULT CALLBACK GameWindow::WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
     if (message == WM_DESTROY) {
@@ -13,17 +16,28 @@ bool GameWindow::InitializeWindow(HINSTANCE hInst, int width, int height, bool f
 
     // win32
     WNDCLASS wndClass;
+    ZeroMemory(&wndClass, sizeof(wndClass));
     wndClass.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
     wndClass.hCursor = LoadCursor(NULL, IDC_ARROW);
     wndClass.hInstance = hInstance;
     wndClass.lpfnWndProc = WindowProc;
     wndClass.lpszClassName = "OOPWindow";
 
-    RegisterClass(&wndClass);
+    if (!RegisterClass(&wndClass)) {
+        MessageBox(NULL, "Failed to register window class.", "Error", MB_OK);
+        cout << "Failed to register window class.";
+        return false;
+    }
 
     DWORD style = fullscreen ? WS_POPUP : WS_OVERLAPPEDWINDOW;
     hWnd = CreateWindowEx(0, "OOPWindow", "DirectX 9 OOP Game", style,
         0, 100, width, height, NULL, NULL, hInstance, NULL);
+
+    if (!hWnd) {
+        MessageBox(NULL, "Failed to create window.", "Error", MB_OK);
+        cout << "Failed to create window.";
+        return false;
+    }
 
     ShowWindow(hWnd, 1);
 
@@ -39,8 +53,13 @@ bool GameWindow::InitializeWindow(HINSTANCE hInst, int width, int height, bool f
     d3dPP.BackBufferHeight = height;
     d3dPP.hDeviceWindow = hWnd;
 
-    d3d->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd,
+    HRESULT hr =d3d->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd,
         D3DCREATE_SOFTWARE_VERTEXPROCESSING, &d3dPP, &d3dDevice);
+
+    if (FAILED(hr)) {
+        MessageBox(NULL, "Failed to create Direct3D Device.", "Error", MB_OK);
+        return false;
+    }
 
     return true;
 }
