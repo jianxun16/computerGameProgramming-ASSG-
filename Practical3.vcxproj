@@ -33,6 +33,7 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Physics.cpp" />
     <ClCompile Include="PhysicsObject.cpp" />
+    <ClCompile Include="PlayState.cpp" />
     <ClCompile Include="StateManager.cpp" />
     <ClCompile Include="TileMap.cpp" />
   </ItemGroup>
@@ -51,6 +52,7 @@
     <ClInclude Include="Input.h" />
     <ClInclude Include="Physics.h" />
     <ClInclude Include="PhysicsObject.h" />
+    <ClInclude Include="PlayState.h" />
     <ClInclude Include="StateManager.h" />
     <ClInclude Include="TileMap.h" />
   </ItemGroup>
