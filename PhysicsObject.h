@@ -27,7 +27,7 @@ public:
     virtual ~PhysicsObject() {}
 
     // setup properties
-    void InitializePhysics(float startMass, float colRadius, float bounce, float drag);
+    void InitializePhysics(float mass, float bounce, float drag, float gScale);
 
     void ApplyForce(D3DXVECTOR2 appliedForce);
     void ApplyGravity(D3DXVECTOR2 gravity);
