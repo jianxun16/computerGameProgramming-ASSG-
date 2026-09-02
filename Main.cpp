@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "GameEngine.h"
+#include "PlayState.h"
 
 #pragma comment(lib, "d3d9.lib")
 #pragma comment(lib, "d3dx9.lib")
@@ -33,6 +34,7 @@ int main(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nSho
     // With nothing pushed the window opens black and closes on X — useful
     // for verifying the engine boots cleanly before adding game code.
     // ------------------------------------------------------------------
+    engine.GetStateManager()->PushState(new PlayState("Assets/Map/Map1.txt", "bgm_stage1"));
 
     engine.Run();
     engine.Shutdown();

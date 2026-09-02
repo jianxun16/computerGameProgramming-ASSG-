@@ -26,7 +26,7 @@ void MenuState::Initialize(GameEngine* eng) {
 }
 
 void MenuState::LayoutButtons(float screenW, float screenH) {
-    float gap = 26.0f; [cite:14]
+    float gap = 26.0f; 
         float x = (screenW - btnW) / 2.0f;
         float y = screenH * 0.42f;
 
