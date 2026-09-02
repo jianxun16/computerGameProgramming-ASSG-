@@ -1,10 +1,9 @@
 #pragma once
 #include "GameState.h"
-#include "StateManager.h"
 #include "TileMap.h"
 #include "Background.h"
-#include "Camera.h"
-// #include "Player.h" 
+#include "Player.h" 
+#include <string>
 
 class PlayState : public GameState {
 private:
@@ -12,8 +11,7 @@ private:
     Background background;
     string mapFile;
     string bgm;
-
-    // Player player;
+    Player player;
 
 public:
     PlayState(string mapPath, string bgmName) {

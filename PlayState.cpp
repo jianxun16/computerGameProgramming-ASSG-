@@ -7,6 +7,9 @@ void PlayState::Initialize(GameEngine* eng) {
     // load assets from engine
     background.load(engine->GetGraphics());
     map.load(engine->GetGraphics(), "Assets/Map/Map1.txt");
+    // load player
+    player.Initialize(engine->GetGraphics(), D3DXVECTOR2(200.0f, 200.0f));
+
     if (!bgm.empty()) {
         engine->GetAudio()->Play(bgm);
     }
@@ -15,7 +18,7 @@ void PlayState::Initialize(GameEngine* eng) {
 void PlayState::UpdateLogic(Input* input, float deltaTime) {
     // 1. Pause Menu check
     if (input->IsKeyJustPressed(DIK_ESCAPE)) {
-        // engine->GetStateManager()->PushState(new PauseState());
+        engine->GetStateManager()->PushState(new PauseState());
         return;
     }
 
