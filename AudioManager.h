@@ -27,13 +27,10 @@ public:
 
     void InitializeAudio();
 
-    // isStream = true for large files (BGM); loop = true for tracks that
-    // should repeat (BGM again). One-shot effects use both defaults.
+    // stream for bgm
     void LoadSound(const string& key, const string& filePath,
         bool isStream = false, bool loop = false);
-
-    // Existing calls Play(key) still work (default SFX).
-    // For music, use Play(key, AudioManager::BGM).
+    // for sfx
     void Play(const string& key, SoundType type = SFX);
     void StopBGM();
 

@@ -26,12 +26,22 @@ bool Graphics::InitializeGraphics(IDirect3DDevice9* d3dDevice) {
 LPDIRECT3DTEXTURE9 Graphics::LoadTexture(string path) {
     LPDIRECT3DTEXTURE9 texture = NULL;
 
-    D3DXCreateTextureFromFileEx(device, path.c_str(), D3DX_DEFAULT, D3DX_DEFAULT,
+    if (FAILED(D3DXCreateTextureFromFileEx(device, path.c_str(), D3DX_DEFAULT, D3DX_DEFAULT,
         D3DX_DEFAULT, NULL, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED,
         D3DX_DEFAULT, D3DX_DEFAULT, 0,
-        NULL, NULL, &texture);
+        NULL, NULL, &texture))) {
+        cout << "Failed to load texture: " << path << endl;
+    };
 
     return texture;
+}
+
+bool Graphics::LoadFont(string fontName, int size, int weight) {
+    HRESULT hr = D3DXCreateFont(device, size, 0, weight, 1, FALSE, DEFAULT_CHARSET,
+        OUT_DEFAULT_PRECIS, ANTIALIASED_QUALITY, DEFAULT_PITCH | FF_DONTCARE,
+        fontName.c_str(), &fontBrush);
+
+    return SUCCEEDED(hr);
 }
 
 void Graphics::BeginRender(int r, int g, int b) {
@@ -41,22 +51,27 @@ void Graphics::BeginRender(int r, int g, int b) {
 }
 
 void Graphics::DrawSprite(LPDIRECT3DTEXTURE9 texture, RECT* srcRect, D3DXMATRIX* transform, D3DCOLOR color) {
-    if (transform) {
+    if (spriteBrush && texture) {
         spriteBrush->SetTransform(transform);
+        spriteBrush->Draw(texture, srcRect, NULL, NULL, color);
     }
-    spriteBrush->Draw(texture, srcRect, NULL, NULL, color);
 }
 
-void Graphics::DrawString(const string& text, RECT rect, D3DCOLOR color, DWORD format) {
-    if (!fontBrush) return;
-    fontBrush->DrawTextA(spriteBrush, text.c_str(), -1, &rect, format, color);
+void Graphics::DrawString(string text, RECT* rect, DWORD alignment, D3DCOLOR color) {
+    if (fontBrush && spriteBrush) {
+        D3DXMATRIX identity;
+        D3DXMatrixIdentity(&identity);
+        spriteBrush->SetTransform(&identity);
+
+        fontBrush->DrawTextA(spriteBrush, text.c_str(), -1, rect, alignment, color);
+    }
 }
 
 void Graphics::DrawLine(D3DXVECTOR2 from, D3DXVECTOR2 to, float width, D3DCOLOR color) {
     if (!lineBrush) return;
     D3DXVECTOR2 pts[2] = { from, to };
     lineBrush->SetWidth(width);
-    lineBrush->Begin();          // line brush has its own batch
+    lineBrush->Begin();          
     lineBrush->Draw(pts, 2, color);
     lineBrush->End();
 }
