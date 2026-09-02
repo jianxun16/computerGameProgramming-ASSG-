@@ -35,20 +35,29 @@ void GameObject::UpdateLogic(float deltaTime) {
     }
 }
 
-void GameObject::RenderFrame(Graphics* graphics) {
+void GameObject::RenderFrame(Graphics* graphics, Camera* camera) {
     if (!active || !texture) return;
 
-    // calculate center & set center
-    D3DXVECTOR2 spriteCenter(spriteWidth / 2.0f, spriteHeight / 2.0f);
-    D3DXVECTOR2 drawPos = position - D3DXVECTOR2(spriteCenter.x * scale.x, spriteCenter.y * scale.y);
-    D3DXMATRIX matrix;
-    D3DXMatrixTransformation2D(&matrix, NULL, 0.0f, &scale, &spriteCenter, rotation, &drawPos);
+    D3DXMATRIX originMat, scaleMat, rotMat, transMat, objectMatrix;
 
+    D3DXMatrixTranslation(&originMat, -(spriteWidth / 2.0f), -(spriteHeight / 2.0f), 0.0f);
+
+    // world transformation
+    D3DXMatrixScaling(&scaleMat, scale.x, scale.y, 1.0f);
+    D3DXMatrixRotationZ(&rotMat, rotation);
+    D3DXMatrixTranslation(&transMat, position.x, position.y, 0.0f);
+
+    // combine
+    objectMatrix = originMat * scaleMat * rotMat * transMat;
+
+    // mutiply by cam matrix, so it fits and will change correctly
+    D3DXMATRIX finalMatrix = objectMatrix * camera->GetViewMatrix();
+
+    RECT* sourceRect = nullptr;
     if (isAnimated) {
-        RECT srcRect = animator.GetSourceRect();
-        graphics->DrawSprite(texture, &srcRect, &matrix);
+        RECT frameRect = animator.GetSourceRect();
+        sourceRect = &frameRect;
     }
-    else {
-        graphics->DrawSprite(texture, NULL, &matrix);
-    }
+
+    graphics->DrawSprite(texture, sourceRect, &finalMatrix);
 }

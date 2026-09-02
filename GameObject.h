@@ -2,6 +2,7 @@
 #include <d3dx9.h>
 #include "Graphics.h"
 #include "AnimationController.h"
+#include "Camera.h"
 
 using namespace std;
 
@@ -28,7 +29,7 @@ public:
     virtual void SetupAnimation(int texWidth, int texHeight, int cols, int rows, int frames, float speed, CycleDirection dir);
 
     virtual void UpdateLogic(float deltaTime);
-    virtual void RenderFrame(Graphics* graphics);
+    virtual void RenderFrame(Graphics* graphics, Camera* camera);
 
     D3DXVECTOR2 GetPosition() const { return position; }
     void SetPosition(D3DXVECTOR2 pos) { position = pos; }
