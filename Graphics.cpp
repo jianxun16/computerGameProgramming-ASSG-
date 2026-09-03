@@ -109,4 +109,5 @@ void Graphics::CleanUpGraphics() {
     if (spriteBrush) { spriteBrush->Release(); spriteBrush = NULL; }
     if (lineBrush) { lineBrush->Release();   lineBrush = NULL; }
     if (fontBrush) { fontBrush->Release();   fontBrush = NULL; }
+    if (whiteTex) { whiteTex->Release();    whiteTex = NULL; }
 }

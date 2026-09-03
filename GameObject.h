@@ -3,6 +3,7 @@
 #include "Graphics.h"
 #include "AnimationController.h"
 #include "Camera.h"
+#include "Sprite.h"
 
 using namespace std;
 
@@ -18,6 +19,8 @@ protected:
     LPDIRECT3DTEXTURE9 texture;
     AnimationController animator;
     bool isAnimated;
+
+    Sprite sprite;   // reusable renderer; builds the transform and draws
 
     bool active;
 

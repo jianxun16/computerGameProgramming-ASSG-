@@ -20,6 +20,9 @@ bool ItemManager::load(Graphics* graphics) {
     mushroomTex = graphics->LoadTexture("Assets/item/mushroom.png");
     tomatoTex = graphics->LoadTexture("Assets/item/tomato.png");
 
+    mushroomSprite.SetTexture(mushroomTex);
+    tomatoSprite.SetTexture(tomatoTex);
+
     // Sit each item on the ground (floor top = row 7).
     float onFloor = 7.0f * TileMap::TILE - SIZE;
 
@@ -57,20 +60,17 @@ void ItemManager::update(Player* player) {
 }
 
 void ItemManager::render(Graphics* graphics, Camera* camera) {
-    float cameraX = camera->GetPosition().x;
-
     for (size_t i = 0; i < items.size(); i++) {
         Item& it = items[i];
         if (!it.active)
             continue;
 
-        LPDIRECT3DTEXTURE9 tex = (it.type == MUSHROOM) ? mushroomTex : tomatoTex;
-        if (!tex)
+        Sprite& s = (it.type == MUSHROOM) ? mushroomSprite : tomatoSprite;
+        if (!s.IsValid())
             continue;
 
-        D3DXMATRIX transM;
-        D3DXMatrixTranslation(&transM, it.x - cameraX, it.y, 0.0f);
-        graphics->DrawSprite(tex, NULL, &transM);
+        // The camera scrolls the item with the world (was a manual it.x - camX).
+        s.Draw(graphics, camera, D3DXVECTOR2(it.x, it.y));
     }
 }
 

@@ -4,7 +4,7 @@
 #include <iostream>
 
 #include "GameEngine.h"
-#include "PlayState.h"
+#include "MenuState.h"
 
 #pragma comment(lib, "d3d9.lib")
 #pragma comment(lib, "d3dx9.lib")
@@ -25,16 +25,9 @@ int main(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nSho
         return 1;
     }
 
-    // ------------------------------------------------------------------
-    // TODO: push the first state here once MenuState / PlayState exist.
-    // Example (once you have MenuState):
-    //     #include "MenuState.h"
-    //     engine.GetStateManager()->PushState(new MenuState());
-    //
-    // With nothing pushed the window opens black and closes on X — useful
-    // for verifying the engine boots cleanly before adding game code.
-    // ------------------------------------------------------------------
-    engine.GetStateManager()->PushState(new PlayState("Assets/Map/Map1.txt", "bgm_stage1"));
+    // GameMenu sits at the bottom of the state stack; it pushes PlayState on
+    // Play, and Victory / Game Over pop the whole game back down to it.
+    engine.GetStateManager()->PushState(new MenuState());
 
     engine.Run();
     engine.Shutdown();

@@ -42,22 +42,15 @@ void Background::drawLayer(Graphics* graphics, float cameraX, int i)
 
     float base = -wrapped;
 
-    D3DXMATRIX scaleMat;
-    D3DXMatrixScaling(&scaleMat, scale, scale, 1.0f);
+    // Three copies side by side give a seamless horizontal wrap. The layers are
+    // fixed to the screen (their own scroll already bakes in the parallax), so
+    // they draw in screen space with no camera.
+    D3DXVECTOR2 scl(scale, scale);
+    layerSprite.SetTexture(layerTexture[i]);
 
-
-    D3DXMATRIX transA, transB, transC;
-    D3DXMatrixTranslation(&transA, base * scale, 0.0f, 0.0f);
-    D3DXMatrixTranslation(&transB, (base + tileW) * scale, 0.0f, 0.0f);
-    D3DXMatrixTranslation(&transC, (base + tileW * 2.0f) * scale, 0.0f, 0.0f);
-
-    D3DXMATRIX matA = scaleMat * transA;
-    D3DXMATRIX matB = scaleMat * transB;
-    D3DXMATRIX matC = scaleMat * transC;
-
-    graphics->DrawSprite(layerTexture[i], NULL, &matA);
-    graphics->DrawSprite(layerTexture[i], NULL, &matB);
-    graphics->DrawSprite(layerTexture[i], NULL, &matC);
+    layerSprite.DrawScreen(graphics, D3DXVECTOR2(base * scale, 0.0f), scl);
+    layerSprite.DrawScreen(graphics, D3DXVECTOR2((base + tileW) * scale, 0.0f), scl);
+    layerSprite.DrawScreen(graphics, D3DXVECTOR2((base + tileW * 2.0f) * scale, 0.0f), scl);
 }
 
 void Background::render(Graphics* graphics, Camera* camera)

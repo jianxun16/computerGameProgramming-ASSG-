@@ -38,27 +38,17 @@ void GameObject::UpdateLogic(float deltaTime) {
 void GameObject::RenderFrame(Graphics* graphics, Camera* camera) {
     if (!active || !texture) return;
 
-    D3DXMATRIX originMat, scaleMat, rotMat, transMat, objectMatrix;
-
-    D3DXMatrixTranslation(&originMat, -(spriteWidth / 2.0f), -(spriteHeight / 2.0f), 0.0f);
-
-    // world transformation
-    D3DXMatrixScaling(&scaleMat, scale.x, scale.y, 1.0f);
-    D3DXMatrixRotationZ(&rotMat, rotation);
-    D3DXMatrixTranslation(&transMat, position.x, position.y, 0.0f);
-
-    // combine
-    objectMatrix = originMat * scaleMat * rotMat * transMat;
-
-    // mutiply by cam matrix, so it fits and will change correctly
-    D3DXMATRIX finalMatrix = objectMatrix * camera->GetViewMatrix();
-
-    RECT  frameRect;
-    RECT* sourceRect = NULL;
+    // Feed the current state into the reusable Sprite, then let it build the
+    // transform and draw. The pivot is the middle of the frame so scaling and
+    // rotation happen around the object's centre.
+    sprite.SetTexture(texture);
     if (isAnimated) {
-        frameRect = animator.GetSourceRect();
-        sourceRect = &frameRect;
+        sprite.SetSourceRect(animator.GetSourceRect());
     }
+    else {
+        sprite.ClearSourceRect();
+    }
+    sprite.SetOrigin(spriteWidth / 2.0f, spriteHeight / 2.0f);
 
-    graphics->DrawSprite(texture, sourceRect, &finalMatrix);
+    sprite.Draw(graphics, camera, position, scale, rotation);
 }

@@ -1,5 +1,6 @@
 #pragma once
 #include "GameState.h"
+#include "Sprite.h"
 #include <d3dx9.h>
 
 class MenuState : public GameState {
@@ -9,8 +10,11 @@ private:
         const char* label;
     };
 
-    LPDIRECT3DTEXTURE9 background;  
-    LPDIRECT3DTEXTURE9 buttonTex;  
+    LPDIRECT3DTEXTURE9 background;
+    LPDIRECT3DTEXTURE9 buttonTex;
+
+    Sprite bgSprite;       // reusable renderers for the menu UI
+    Sprite buttonSprite;
 
     Button playBtn;
     Button settingBtn;

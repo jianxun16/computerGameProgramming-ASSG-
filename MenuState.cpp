@@ -10,6 +10,9 @@ void MenuState::Initialize(GameEngine* eng) {
     background = engine->GetGraphics()->LoadTexture("Assets/menu/menu.png");
     buttonTex = engine->GetGraphics()->LoadTexture("Assets/menu/Button1.png");
 
+    bgSprite.SetTexture(background);
+    buttonSprite.SetTexture(buttonTex);
+
     btnW = 260.0f;
     btnH = 72.0f;
 
@@ -72,19 +75,17 @@ void MenuState::UpdateLogic(Input* input, float deltaTime) {
 void MenuState::DrawButton(Graphics* graphics, const Button& b, bool hovered) {
     if (buttonTex) {
         D3DSURFACE_DESC desc;
-        buttonTex->GetLevelDesc(0, &desc); 
+        buttonTex->GetLevelDesc(0, &desc);
 
-        float scaleX = btnW / (float)desc.Width; 
-        float scaleY = btnH / (float)desc.Height; 
-
-        D3DXMATRIX scaleMat, transMat, finalMat;
-        D3DXMatrixScaling(&scaleMat, scaleX, scaleY, 1.0f);
-        D3DXMatrixTranslation(&transMat, (float)b.rect.left, (float)b.rect.top, 0.0f);
-        finalMat = scaleMat * transMat;
+        // Stretch the button texture to the laid-out rect size.
+        float scaleX = btnW / (float)desc.Width;
+        float scaleY = btnH / (float)desc.Height;
 
         // White when hovered, dimmed otherwise[cite: 14]
         D3DCOLOR tint = hovered ? D3DCOLOR_XRGB(255, 255, 255) : D3DCOLOR_XRGB(205, 205, 205);
-        graphics->DrawSprite(buttonTex, NULL, &finalMat, tint);
+        buttonSprite.DrawScreen(graphics,
+            D3DXVECTOR2((float)b.rect.left, (float)b.rect.top),
+            D3DXVECTOR2(scaleX, scaleY), 0.0f, tint);
     }
 
     RECT r = b.rect;
@@ -100,9 +101,10 @@ void MenuState::RenderFrame(Graphics* graphics) {
         D3DSURFACE_DESC desc;
         background->GetLevelDesc(0, &desc);
 
-        D3DXMATRIX scaleMat;
-        D3DXMatrixScaling(&scaleMat, W / (float)desc.Width, H / (float)desc.Height, 1.0f);
-        graphics->DrawSprite(background, NULL, &scaleMat, D3DCOLOR_XRGB(255, 255, 255));
+        // Stretch the background to fill the whole screen.
+        bgSprite.DrawScreen(graphics, D3DXVECTOR2(0.0f, 0.0f),
+            D3DXVECTOR2(W / (float)desc.Width, H / (float)desc.Height),
+            0.0f, D3DCOLOR_XRGB(255, 255, 255));
     }
 
     // 2. Draw Title

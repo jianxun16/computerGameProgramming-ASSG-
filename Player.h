@@ -6,11 +6,13 @@
 #include "Graphics.h"
 #include "Camera.h"
 #include "AudioManager.h"
+#include "Sprite.h"
 
 class Player : public PhysicsObject {
 private:
     AnimationController anim;
     LPDIRECT3DTEXTURE9 spriteSheet;
+    Sprite sprite;   // reusable renderer for the warrior sprite sheet
 
     // Player specific stats
     float moveSpeed;

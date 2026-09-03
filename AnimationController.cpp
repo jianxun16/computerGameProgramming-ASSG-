@@ -30,6 +30,11 @@ void AnimationController::Update(float deltaTime) {
     }
 }
 
+void AnimationController::Reset() {
+    currentFrame = 0;
+    timer = 0.0f;
+}
+
 void AnimationController::SetTrack(int trackIndex) {
     activeTrack = trackIndex;
 }

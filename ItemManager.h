@@ -1,6 +1,7 @@
 #pragma once
 #include "Graphics.h"
 #include "Camera.h"
+#include "Sprite.h"
 #include <vector>
 
 class Player;
@@ -27,4 +28,7 @@ private:
     std::vector<Item>  items;
     LPDIRECT3DTEXTURE9 mushroomTex;
     LPDIRECT3DTEXTURE9 tomatoTex;
+
+    Sprite mushroomSprite;   // reusable renderers for the two item textures
+    Sprite tomatoSprite;
 };

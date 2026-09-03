@@ -3,6 +3,7 @@
 #include <d3dx9.h>
 #include "Graphics.h"
 #include "Camera.h"
+#include "Sprite.h"
 
 
 class TileMap
@@ -34,4 +35,8 @@ private:
     LPDIRECT3DTEXTURE9 grassTex;
     LPDIRECT3DTEXTURE9 rockTex;
     LPDIRECT3DTEXTURE9 spikeTex;
-}; 
+
+    Sprite grassSprite;   // reusable renderers, one per tile texture
+    Sprite rockSprite;
+    Sprite spikeSprite;
+};

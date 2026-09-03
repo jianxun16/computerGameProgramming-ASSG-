@@ -41,7 +41,7 @@ void Player::ChangeState(AnimState newState) {
 
     currentState = newState;
     anim.SetTrack((int)newState);
-    // anim.Reset(); // TODO: Add a Reset() function to your AnimationController to snap to frame 0
+    anim.Reset();   // snap to frame 0 so the new animation starts clean
 }
 
 void Player::UpdateLogic(Input* input, float deltaTime, AudioManager* audio) {
@@ -153,31 +153,23 @@ void Player::ResolveMapCollisions(TileMap* map) {
 void Player::RenderFrame(Graphics* graphics, Camera* camera) {
     if (!spriteSheet) return;
 
-    // Get the frame slice from your controller
-    RECT srcRect = anim.GetSourceRect();
+    // Point the Sprite at the current animation frame of the sheet.
+    sprite.SetTexture(spriteSheet);
+    sprite.SetSourceRect(anim.GetSourceRect());
 
-    // 1. Calculate base position adjusted by camera
-    D3DXVECTOR2 screenPos = GetPosition();
-    if (camera) {
-        screenPos.x -= camera->GetPosition().x;
-        screenPos.y -= camera->GetPosition().y;
-    }
-
-    // 2. Build the transform matrix
-    D3DXMATRIX scaleMat, transMat, finalMat;
-
-    // Flip horizontal if moving left, and apply the uniform character zoom.
+    // Flip horizontally when facing left, and apply the uniform character zoom.
+    // A negative scale.x mirrors the sprite around its (top-left) origin.
     float scaleX = (facingLeft ? -1.0f : 1.0f) * charScale;
-    D3DXMatrixScaling(&scaleMat, scaleX, charScale, 1.0f);
+    D3DXVECTOR2 scl(scaleX, charScale);
 
-    // Offset is the box-centre -> cell-top vector in cell space, so it scales with
-    // the character to keep the feet planted as the sprite grows / shrinks.
-    D3DXMatrixTranslation(&transMat, screenPos.x + spriteOffset.x * charScale, screenPos.y + spriteOffset.y * charScale, 0.0f);
+    // spriteOffset is the box-centre -> sprite top-left vector; it scales with
+    // the character so the feet stay planted as the warrior grows / shrinks.
+    // We add it in world space and let the camera do the scrolling.
+    D3DXVECTOR2 worldPos = GetPosition();
+    worldPos.x += spriteOffset.x * charScale;
+    worldPos.y += spriteOffset.y * charScale;
 
-    finalMat = scaleMat * transMat;
-
-    // 3. Draw
-    graphics->DrawSprite(spriteSheet, &srcRect, &finalMat);
+    sprite.Draw(graphics, camera, worldPos, scl);
 }
 
 void Player::GetWorldHitbox(float& left, float& top, float& right, float& bottom) const {

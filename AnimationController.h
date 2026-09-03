@@ -32,6 +32,8 @@ public:
 
     void Update(float deltaTime);
 
+    void Reset();   // snap back to the first frame (call when the track changes)
+
     void SetTrack(int trackIndex);
     void SetDirection(CycleDirection dir);
 

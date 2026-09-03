@@ -22,6 +22,10 @@ bool TileMap::load(Graphics* graphics, const char* mapFile)
     rockTex = graphics->LoadTexture("Assets/mapItem/rock.png");
     spikeTex = graphics->LoadTexture("Assets/mapItem/spike.png");
 
+    grassSprite.SetTexture(grassTex);
+    rockSprite.SetTexture(rockTex);
+    spikeSprite.SetTexture(spikeTex);
+
     ifstream file(mapFile);
     if (!file) { MessageBox(NULL, mapFile, "map file not found!", MB_OK); return false; }
 
@@ -109,31 +113,17 @@ void TileMap::render(Graphics* graphics, Camera* camera, int screenWidth)
             int t = tiles[r][c];
             if (t == EMPTY) continue;
 
-            float worldX = c * (float)TILE;
-            float worldY = r * (float)TILE;
-
-            D3DXMATRIX scaleMat, transMat, worldMat, finalMatrix;
-
-            if (t == ROCK) {
-                D3DXMatrixScaling(&scaleMat, 2.0f, 2.0f, 1.0f);
-            }
-            else {
-                D3DXMatrixScaling(&scaleMat, 1.0f, 1.0f, 1.0f);
-            }
-
-            D3DXMatrixTranslation(&transMat, worldX, worldY, 0.0f);
-            worldMat = scaleMat * transMat;
-
-            finalMatrix = worldMat * camera->GetViewMatrix();
+            D3DXVECTOR2 worldPos(c * (float)TILE, r * (float)TILE);
 
             if (t == GRASS) {
-                graphics->DrawSprite(grassTex, NULL, &finalMatrix);
+                grassSprite.Draw(graphics, camera, worldPos);
             }
             else if (t == SPIKE) {
-                graphics->DrawSprite(spikeTex, NULL, &finalMatrix);
+                spikeSprite.Draw(graphics, camera, worldPos);
             }
             else if (t == ROCK) {
-                graphics->DrawSprite(rockTex, NULL, &finalMatrix);
+                // Rocks render at 2x, matching the original tile scaling.
+                rockSprite.Draw(graphics, camera, worldPos, D3DXVECTOR2(2.0f, 2.0f));
             }
         }
     }

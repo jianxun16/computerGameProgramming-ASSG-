@@ -1,6 +1,7 @@
 #pragma once
 #include "Graphics.h"
 #include "Camera.h"
+#include "Sprite.h"
 
 // parallex
 class Background
@@ -20,8 +21,10 @@ public:
 private:
     void drawLayer(Graphics* graphics, float cameraX, int i);
 
-    LPDIRECT3DTEXTURE9 layerTexture[NUM_LAYERS]; 
-    float parallaxFactor[NUM_LAYERS]; 
-    int sourceSize;  
-    float scale;        
+    LPDIRECT3DTEXTURE9 layerTexture[NUM_LAYERS];
+    float parallaxFactor[NUM_LAYERS];
+    int sourceSize;
+    float scale;
+
+    Sprite layerSprite;   // reusable renderer, re-pointed at each layer texture
 };
