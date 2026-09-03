@@ -58,5 +58,7 @@ public:
     void SetTrack(int trackIndex);
     void SetDirection(CycleDirection dir);
 
+    int GetCurrentFrame() const { return currentFrame; }
+
     RECT GetSourceRect() const;
 };

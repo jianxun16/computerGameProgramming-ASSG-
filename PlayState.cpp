@@ -14,7 +14,7 @@ void PlayState::Initialize(GameEngine* eng) {
     // 1. Use the dynamic mapFile string instead of hardcoding Map1
     map.load(engine->GetGraphics(), mapFile.c_str());
 
-    player.Initialize(engine->GetGraphics(), D3DXVECTOR2(200.0f, 200.0f));
+    player.Initialize(engine->GetGraphics(), D3DXVECTOR2(300.0f, 400.0f));
 
     items.load(engine->GetGraphics());
 

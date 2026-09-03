@@ -1,7 +1,7 @@
 #include "MenuState.h"
 #include "GameEngine.h"
 #include "PlayState.h"
-// #include "SettingState.h" // Uncomment when you migrate SettingState
+#include "SettingState.h" // Uncomment when you migrate SettingState
 
 void MenuState::Initialize(GameEngine* eng) {
     GameState::Initialize(eng);
@@ -64,7 +64,7 @@ void MenuState::UpdateLogic(Input* input, float deltaTime) {
             engine->GetStateManager()->PushState(new PlayState("Assets/Map/Map1.txt", "bgm_stage1"));
         }
         else if (PointInRect(mx, my, settingBtn.rect)) {
-            // engine->GetStateManager()->PushState(new SettingState());
+            engine->GetStateManager()->PushState(new SettingState());
         }
         else if (PointInRect(mx, my, exitBtn.rect)) {
             PostQuitMessage(0);

@@ -36,9 +36,9 @@ bool GameEngine::Initialize(HINSTANCE hInst, int width, int height, bool fullscr
     // Preload the game's sounds once so the states can Play() them by key.
     audio.LoadSound("bgm_stage1", "Assets/BGM/Map1BGM.wav", true, true);   // stream + loop
     audio.LoadSound("BossBGM", "Assets/Boss/BossBGM.wav", true, true);     // stream + loop
-    audio.LoadSound("JumpSFX", "Assets/SoundEffect/PlayerJump.wav");
-    audio.LoadSound("SlashSFX", "Assets/SoundEffect/SwordSlash.wav");
-    audio.LoadSound("BossAttack", "Assets/Boss/67_bossAttackSoundEffect.wav");
+    audio.LoadSound("JumpSFX", "Assets/SoundEffect/PlayerJump.wav",false,false);
+    audio.LoadSound("SlashSFX", "Assets/SoundEffect/SwordSlash.wav",false,false);
+    audio.LoadSound("BossAttack", "Assets/Boss/67_bossAttackSoundEffect.wav",false,false);
     cout << "initalizing audio..\n";
 
     // frame timer
@@ -60,30 +60,33 @@ void GameEngine::Run() {
 
     while (window.ProcessMessages()) {
 
-        // input
-        input.PollDeviceStates();
-
         // cheat console: type "idkfa" + Enter in the console window to toggle god mode
         Cheat::pollConsole();
 
-        // physics and update
         int ticks = timer.FrameToUpdate();
         for (int i = 0; i < ticks; i++) {
+
+            // input
+            input.PollDeviceStates();
+
+            // physics and update
             GameState* active = stateManager.GetActiveState();
             if (active) active->UpdateLogic(&input, fixedDt);
+
+            // render the whole stack so overlays (pause / end) sit on the frozen scene
+            graphics.BeginRender(0, 0, 0);
+            stateManager.RenderAll(&graphics);
+            graphics.EndRender();
+
+            // sound
+            audio.UpdateSound();
+
+            // state
+            stateManager.ApplyPendingTransitions();
         }
         if (camera) camera->Update();
 
-        // render the whole stack so overlays (pause / end) sit on the frozen scene
-        graphics.BeginRender(0, 0, 0);
-        stateManager.RenderAll(&graphics);
-        graphics.EndRender();
 
-        // sound
-        audio.UpdateSound();
-
-        // state
-        stateManager.ApplyPendingTransitions();
     }
 }
 
