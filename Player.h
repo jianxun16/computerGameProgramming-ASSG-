@@ -46,7 +46,7 @@ public:
     // Kept separate from UpdateLogic so the PlayState can control the execution order
     void ResolveMapCollisions(TileMap* map);
 
-    void RenderFrame(Graphics* graphics, Camera* camera);
+    void RenderFrame(Graphics* graphics, Camera* camera) override;   // overrides GameObject::RenderFrame
 
     // ---- World-space helpers used by the gameplay states ----
     // Position is the CENTRE of the collider box, so feet = centre + halfHeight.
