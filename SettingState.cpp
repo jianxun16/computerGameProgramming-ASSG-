@@ -92,21 +92,21 @@ void SettingState::RenderFrame(Graphics* graphics) {
     float H = (float)engine->GetScreenHeight();
 
     float panelW = 440.0f, panelH = 340.0f; 
-    float panelX = (W - panelW) / 2.0f; 
-    float panelY = (H - panelH) / 2.0f; 
+        float panelX = (W - panelW) / 2.0f; 
+        float panelY = (H - panelH) / 2.0f; 
 
-    // Overlays and Panels
-    graphics->DrawRect(0.0f, 0.0f, W, H, D3DCOLOR_ARGB(160, 0, 0, 0)); 
-    graphics->DrawRect(panelX, panelY, panelW, panelH, D3DCOLOR_ARGB(235, 28, 32, 46)); 
+        // Overlays and Panels
+        graphics->DrawRect(0.0f, 0.0f, W, H, D3DCOLOR_ARGB(160, 0, 0, 0)); 
+        graphics->DrawRect(panelX, panelY, panelW, panelH, D3DCOLOR_ARGB(235, 28, 32, 46)); 
 
-    // Exit Button Logic
-    int mx = engine->GetInput()->GetMouseX();
+        // Exit Button Logic
+        int mx = engine->GetInput()->GetMouseX();
     int my = engine->GetInput()->GetMouseY();
     bool hovExit = PointInRect(mx, my, exitX, exitY, exitW, exitH); 
         graphics->DrawRect(exitX, exitY, exitW, exitH, hovExit ? D3DCOLOR_ARGB(255, 200, 90, 90) : D3DCOLOR_ARGB(255, 130, 60, 60)); 
 
-    // BGM Slider Bar
-    graphics->DrawRect(bgm.x, bgm.y, bgm.w, bgm.h, D3DCOLOR_ARGB(255, 70, 74, 90)); // Track
+        // BGM Slider Bar
+        graphics->DrawRect(bgm.x, bgm.y, bgm.w, bgm.h, D3DCOLOR_ARGB(255, 70, 74, 90)); // Track
     graphics->DrawRect(bgm.x, bgm.y, bgm.value * bgm.w, bgm.h, D3DCOLOR_ARGB(255, 90, 200, 120)); // Fill
     graphics->DrawRect(bgm.x + (bgm.value * bgm.w) - 7.0f, bgm.y - 6.0f, 14.0f, bgm.h + 12.0f, D3DCOLOR_ARGB(255, 240, 240, 245)); // Knob
 

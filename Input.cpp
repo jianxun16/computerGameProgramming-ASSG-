@@ -21,31 +21,31 @@ bool Input::InitializeInput(HINSTANCE hInstance, HWND windowHandle) {
     dInput->CreateDevice(GUID_SysKeyboard, &keyboard, NULL);
     keyboard->SetDataFormat(&c_dfDIKeyboard);
     keyboard->SetCooperativeLevel(hWnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
-    keyboard->Acquire();
+    keyboard->Acquire();  
 
     dInput->CreateDevice(GUID_SysMouse, &mouse, NULL);
     mouse->SetDataFormat(&c_dfDIMouse);
     mouse->SetCooperativeLevel(hWnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
-    mouse->Acquire();
+    mouse->Acquire();   
 
     return true;
 }
 
 void Input::PollDeviceStates() {
+
     memcpy(prevKeys, keys, sizeof(keys));
     prevMouseState = mouseState;
 
+
     HRESULT hr = keyboard->GetDeviceState(sizeof(keys), (LPVOID)&keys);
     if (FAILED(hr)) {
-        ZeroMemory(keys, sizeof(keys)); // Keeps keys from getting stuck down
         if (hr == DIERR_INPUTLOST || hr == DIERR_NOTACQUIRED) {
-            keyboard->Acquire();
+            keyboard->Acquire(); // reacquire if tabbed
         }
     }
 
     hr = mouse->GetDeviceState(sizeof(DIMOUSESTATE), (LPVOID)&mouseState);
     if (FAILED(hr)) {
-        ZeroMemory(&mouseState, sizeof(mouseState)); // Keeps clicks from getting stuck
         if (hr == DIERR_INPUTLOST || hr == DIERR_NOTACQUIRED) {
             mouse->Acquire();
         }
@@ -53,28 +53,26 @@ void Input::PollDeviceStates() {
 
     if (hWnd != NULL) {
         POINT pt;
-        GetCursorPos(&pt);
+        GetCursorPos(&pt);           
         ScreenToClient(hWnd, &pt);
-
-        RECT clientRect;
-        GetClientRect(hWnd, &clientRect);
-
-        if (clientRect.right > 0 && clientRect.bottom > 0) {
-            float scaleX = 1280.0f / (float)clientRect.right;
-            float scaleY = 720.0f / (float)clientRect.bottom;
-
-            mouseX = (int)(pt.x * scaleX);
-            mouseY = (int)(pt.y * scaleY);
-        }
-        else {
-            mouseX = pt.x;
-            mouseY = pt.y;
-        }
+        mouseX = pt.x;
+        mouseY = pt.y;
     }
 }
 
 void Input::CleanUpInput() {
-    if (keyboard) { keyboard->Unacquire(); keyboard->Release(); keyboard = NULL; }
-    if (mouse) { mouse->Unacquire(); mouse->Release(); mouse = NULL; }
-    if (dInput) { dInput->Release(); dInput = NULL; }
+    if (keyboard) {
+        keyboard->Unacquire();
+        keyboard->Release();
+        keyboard = NULL;
+    }
+    if (mouse) {
+        mouse->Unacquire();
+        mouse->Release();
+        mouse = NULL;
+    }
+    if (dInput) {
+        dInput->Release();
+        dInput = NULL;
+    }
 }

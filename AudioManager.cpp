@@ -13,16 +13,15 @@ AudioManager::AudioManager() {
 }
 
 void AudioManager::InitializeAudio() {
-    FMOD::System_Create(&system);
-
-    system->setDSPBufferSize(512, 4);
-    system->init(512, FMOD_INIT_NORMAL, NULL);
+    result = FMOD::System_Create(&system);
+    result = system->init(32, FMOD_INIT_NORMAL, 0);
 
     system->createChannelGroup("BGM", &bgmGroup);
     system->createChannelGroup("SFX", &sfxGroup);
+    if (bgmGroup) bgmGroup->setVolume(bgmVolume);
+    if (sfxGroup) sfxGroup->setVolume(sfxVolume);
 
-    bgmVolume = 1.0f;
-    sfxVolume = 1.0f;
+    channel = NULL;
 }
 
 void AudioManager::LoadSound(const string& key, const string& filePath, bool isStream, bool loop) {
