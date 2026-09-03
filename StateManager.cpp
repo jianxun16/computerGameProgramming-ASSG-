@@ -19,6 +19,11 @@ void StateManager::ChangeState(GameState* state) {
     pending.push_back(p);
 }
 
+void StateManager::PopToBottom() {
+    Pending p; p.type = P_POPBOTTOM; p.state = NULL;
+    pending.push_back(p);
+}
+
 void StateManager::ApplyPendingTransitions() {
     for (size_t i = 0; i < pending.size(); i++) {
         Pending& p = pending[i];
@@ -41,13 +46,22 @@ void StateManager::ApplyPendingTransitions() {
                 stateStack.back()->Resume();
             }
         }
-        else { // change: pop then push
+        else if (p.type == P_CHANGE) { // change: pop then push
             if (!stateStack.empty()) {
                 delete stateStack.back();
                 stateStack.pop_back();
             }
             stateStack.push_back(p.state);
             stateStack.back()->Initialize(engine);
+        }
+        else { // pop to bottom: destroy everything above the root, resume it
+            while (stateStack.size() > 1) {
+                delete stateStack.back();
+                stateStack.pop_back();
+            }
+            if (!stateStack.empty()) {
+                stateStack.back()->Resume();
+            }
         }
     }
     pending.clear();
@@ -56,6 +70,13 @@ void StateManager::ApplyPendingTransitions() {
 GameState* StateManager::GetActiveState() {
     if (stateStack.empty()) return NULL;
     return stateStack.back();
+}
+
+void StateManager::RenderAll(Graphics* graphics) {
+    // Bottom -> top, so a paused level shows through its pause / end overlay.
+    for (GameState* state : stateStack) {
+        state->RenderFrame(graphics);
+    }
 }
 
 void StateManager::CleanUpStates() {

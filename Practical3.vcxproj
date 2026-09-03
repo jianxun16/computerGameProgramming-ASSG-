@@ -23,8 +23,12 @@
     <ClCompile Include="AssetManager.cpp" />
     <ClCompile Include="AudioManager.cpp" />
     <ClCompile Include="Background.cpp" />
+    <ClCompile Include="BossState.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Cheat.cpp" />
+    <ClCompile Include="EndState.cpp" />
     <ClCompile Include="FrameTimer.cpp" />
+    <ClCompile Include="ItemManager.cpp" />
     <ClCompile Include="GameEngine.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GameWindow.cpp" />
@@ -46,8 +50,13 @@
     <ClInclude Include="AssetManager.h" />
     <ClInclude Include="AudioManager.h" />
     <ClInclude Include="Background.h" />
+    <ClInclude Include="BossState.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Cheat.h" />
+    <ClInclude Include="EndState.h" />
     <ClInclude Include="FrameTimer.h" />
+    <ClInclude Include="GameLog.h" />
+    <ClInclude Include="ItemManager.h" />
     <ClInclude Include="GameEngine.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GameState.h" />

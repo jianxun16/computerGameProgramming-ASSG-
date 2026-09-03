@@ -18,6 +18,12 @@ private:
     bool isJumping;
     bool facingLeft;
     bool isAttacking;
+    float attackTimer;   // seconds left in the current one-shot attack
+
+    // Base collider size at scale 1.0; the live box = base * charScale.
+    static const int BASE_BOX_W = 32;
+    static const int BASE_BOX_H = 64;
+    float charScale;     // uniform character zoom (item pickups resize this)
 
     // Sprite offset tuning
     D3DXVECTOR2 spriteOffset;
@@ -39,4 +45,20 @@ public:
     void ResolveMapCollisions(TileMap* map);
 
     void RenderFrame(Graphics* graphics, Camera* camera);
+
+    // ---- World-space helpers used by the gameplay states ----
+    // Position is the CENTRE of the collider box, so feet = centre + halfHeight.
+    float GetFeetY() const { return GetPosition().y + GetBoxHeight() / 2.0f; }
+    float GetFeetWorldX() const { return GetPosition().x; }
+    void  GetWorldHitbox(float& left, float& top, float& right, float& bottom) const;
+
+    // Attack range: a circle in front of the player, active only while a one-shot
+    // attack is playing. Returns true and fills centre (world space) + radius when
+    // active, so a state can test hits against enemies (e.g. the boss).
+    bool  GetAttackCircleWorld(D3DXVECTOR2& centre, float& radius) const;
+
+    // Uniform character zoom (item pickups shrink / grow the warrior). Feet stay
+    // planted, and the collider box scales with it.
+    void  SetScale(float s);
+    float GetScale() const { return charScale; }
 };

@@ -82,7 +82,7 @@ void PauseState::UpdateLogic(Input* input, float deltaTime) {
         }
         else if (PointInRect(mx, my, menuX, menuY, menuW, menuH)) {
             engine->GetAudio()->StopBGM();
-            // engine->GetStateManager()->ChangeState(new MenuState());
+            engine->GetStateManager()->PopToBottom();   // clear the game -> back to menu
         }
     }
 }

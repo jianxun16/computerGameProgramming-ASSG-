@@ -7,6 +7,8 @@ Player::Player() {
     isJumping = false;
     facingLeft = false;
     isAttacking = false;
+    attackTimer = 0.0f;
+    charScale = 1.0f;
     currentState = IDLE;
 
     // Offset the sprite so the bottom-center of the character visually 
@@ -22,7 +24,8 @@ void Player::Initialize(Graphics* graphics, D3DXVECTOR2 startPos) {
     // 1. Setup Physics Object Base
     SetPosition(startPos);
     InitializePhysics(1.0f, 0.0f, 0.0f, 9.8f); // Mass, Bounce, Drag, Gravity Scale
-    SetColliderBox(32.0f, 64.0f); // Width and Height of the hit box
+    charScale = 1.0f;
+    SetColliderBox((float)BASE_BOX_W, (float)BASE_BOX_H); // Width and Height of the hit box
 
     // 2. Load Texture
     spriteSheet = graphics->LoadTexture("Assets/Player/Warrior_Anim.png");
@@ -63,17 +66,25 @@ void Player::UpdateLogic(Input* input, float deltaTime, AudioManager* audio) {
         if (audio) audio->Play("JumpSFX");
     }
 
-    // 4. Attack Input
-    if (input->IsMouseButtonJustPressed(0)) {
+    // 4. Attack Input (one-shot: fires an attack that lasts attackTimer seconds)
+    if (input->IsMouseButtonJustPressed(0) && !isAttacking) {
         isAttacking = true;
+        attackTimer = 0.30f;   // attack (and its hit circle) stays active this long
         if (audio) audio->Play("SlashSFX");
+    }
+
+    // Tick the one-shot attack down; clear it when the swing finishes.
+    if (isAttacking) {
+        attackTimer -= deltaTime;
+        if (attackTimer <= 0.0f) {
+            isAttacking = false;
+            attackTimer = 0.0f;
+        }
     }
 
     // 5. Determine Animation State
     if (isAttacking) {
         ChangeState(ATTACK);
-        // Note: You will need logic here or in AnimationController to flag when 
-        // a non-looping animation (like an attack) finishes, so isAttacking = false.
     }
     else if (vel.x != 0.0f) {
         ChangeState(RUN);
@@ -155,15 +166,53 @@ void Player::RenderFrame(Graphics* graphics, Camera* camera) {
     // 2. Build the transform matrix
     D3DXMATRIX scaleMat, transMat, finalMat;
 
-    // Flip horizontal if moving left
-    float scaleX = facingLeft ? -1.0f : 1.0f;
-    D3DXMatrixScaling(&scaleMat, scaleX, 1.0f, 1.0f);
+    // Flip horizontal if moving left, and apply the uniform character zoom.
+    float scaleX = (facingLeft ? -1.0f : 1.0f) * charScale;
+    D3DXMatrixScaling(&scaleMat, scaleX, charScale, 1.0f);
 
-    // Apply offset so the feet touch the bottom of the physics box, and move to screen pos
-    D3DXMatrixTranslation(&transMat, screenPos.x + spriteOffset.x, screenPos.y + spriteOffset.y, 0.0f);
+    // Offset is the box-centre -> cell-top vector in cell space, so it scales with
+    // the character to keep the feet planted as the sprite grows / shrinks.
+    D3DXMatrixTranslation(&transMat, screenPos.x + spriteOffset.x * charScale, screenPos.y + spriteOffset.y * charScale, 0.0f);
 
     finalMat = scaleMat * transMat;
 
     // 3. Draw
     graphics->DrawSprite(spriteSheet, &srcRect, &finalMat);
+}
+
+void Player::GetWorldHitbox(float& left, float& top, float& right, float& bottom) const {
+    D3DXVECTOR2 pos = GetPosition();
+    float halfW = GetBoxWidth() / 2.0f;
+    float halfH = GetBoxHeight() / 2.0f;
+    left = pos.x - halfW;
+    top = pos.y - halfH;
+    right = pos.x + halfW;
+    bottom = pos.y + halfH;
+}
+
+bool Player::GetAttackCircleWorld(D3DXVECTOR2& centre, float& radius) const {
+    if (!isAttacking) return false;   // circle only exists during the swing
+
+    float half = GetBoxWidth() / 2.0f;
+    radius = 60.0f * charScale;
+
+    // Sit the circle just in front of the character, at chest/centre height.
+    float dir = facingLeft ? -1.0f : 1.0f;
+    centre.x = GetPosition().x + dir * (half + radius * 0.5f);
+    centre.y = GetPosition().y;
+    return true;
+}
+
+void Player::SetScale(float s) {
+    if (s < 1.0f) s = 1.0f;   // never smaller than the original size
+    if (s > 4.0f) s = 4.0f;   // clamp the maximum
+
+    // Keep the feet planted while the box resizes around them.
+    float feetY = GetPosition().y + GetBoxHeight() / 2.0f;
+    charScale = s;
+    SetColliderBox(BASE_BOX_W * s, BASE_BOX_H * s);
+
+    D3DXVECTOR2 p = GetPosition();
+    p.y = feetY - GetBoxHeight() / 2.0f;
+    SetPosition(p);
 }

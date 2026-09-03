@@ -1,4 +1,5 @@
 #include "GameEngine.h"
+#include "Cheat.h"
 #include <iostream>
 
 using namespace std;
@@ -32,6 +33,12 @@ bool GameEngine::Initialize(HINSTANCE hInst, int width, int height, bool fullscr
 
     // audio
     audio.InitializeAudio();
+    // Preload the game's sounds once so the states can Play() them by key.
+    audio.LoadSound("bgm_stage1", "Assets/BGM/Map1BGM.wav", true, true);   // stream + loop
+    audio.LoadSound("BossBGM", "Assets/Boss/BossBGM.wav", true, true);     // stream + loop
+    audio.LoadSound("JumpSFX", "Assets/SoundEffect/PlayerJump.wav");
+    audio.LoadSound("SlashSFX", "Assets/SoundEffect/SwordSlash.wav");
+    audio.LoadSound("BossAttack", "Assets/Boss/67_bossAttackSoundEffect.wav");
     cout << "initalizing audio..\n";
 
     // frame timer
@@ -56,6 +63,9 @@ void GameEngine::Run() {
         // input
         input.PollDeviceStates();
 
+        // cheat console: type "idkfa" + Enter in the console window to toggle god mode
+        Cheat::pollConsole();
+
         // physics and update
         int ticks = timer.FrameToUpdate();
         for (int i = 0; i < ticks; i++) {
@@ -64,10 +74,9 @@ void GameEngine::Run() {
         }
         if (camera) camera->Update();
 
-        // render
+        // render the whole stack so overlays (pause / end) sit on the frozen scene
         graphics.BeginRender(0, 0, 0);
-        GameState* active = stateManager.GetActiveState();
-        if (active) active->RenderFrame(&graphics);
+        stateManager.RenderAll(&graphics);
         graphics.EndRender();
 
         // sound

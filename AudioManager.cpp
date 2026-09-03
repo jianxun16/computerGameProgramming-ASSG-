@@ -25,6 +25,9 @@ void AudioManager::InitializeAudio() {
 }
 
 void AudioManager::LoadSound(const string& key, const string& filePath, bool isStream, bool loop) {
+    // Don't reload a key that's already loaded (avoids leaking the old FMOD sound).
+    if (soundMap.find(key) != soundMap.end()) return;
+
     FMOD::Sound* newSound = NULL;
 
     if (isStream) {
