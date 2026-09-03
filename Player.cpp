@@ -10,16 +10,6 @@ Player::Player() {
     attackTimer = 0.0f;
     charScale = 1.0f;
     currentState = IDLE;
-
-    // Vector from the collider-box CENTRE (= GetPosition()) to the sprite's
-    // top-left corner. The old art puts the character's feet at (100, 137)
-    // inside a 192px cell, and the collider reaches BASE_BOX_H/2 = 32px above
-    // the feet, so the feet must land on the box BOTTOM (the ground contact):
-    //   x: -FEET_CENTER_X               = -100  (feet on the box centre-line)
-    //   y: -(FEET_Y - BASE_BOX_H / 2)   = -105  (feet on the box bottom = ground)
-    // Using -137 (the old -FEET_Y) instead put the feet on the box CENTRE,
-    // floating the warrior ~32px above the tiles.
-    spriteOffset = D3DXVECTOR2(-100.0f, -105.0f);
 }
 
 Player::~Player() {
@@ -176,17 +166,23 @@ void Player::RenderFrame(Graphics* graphics, Camera* camera) {
     sprite.SetTexture(spriteSheet);
     sprite.SetSourceRect(anim.GetSourceRect());
 
-    // Flip horizontally when facing left, and apply the uniform character zoom.
-    // A negative scale.x mirrors the sprite around its (top-left) origin.
+    // Pivot on the CENTRE of the frame (not the top-left corner). A left/right
+    // flip then mirrors the warrior in place; with the old corner pivot a flip
+    // swung him a whole frame-width (192px) sideways.
+    sprite.CenterOrigin();
+
+    // Negative scale.x mirrors the sprite; charScale is the uniform zoom.
     float scaleX = (facingLeft ? -1.0f : 1.0f) * charScale;
     D3DXVECTOR2 scl(scaleX, charScale);
 
-    // spriteOffset is the box-centre -> sprite top-left vector; it scales with
-    // the character so the feet stay planted as the warrior grows / shrinks.
-    // We add it in world space and let the camera do the scrolling.
+    // worldPos is now the CENTRE of the drawn frame, so:
+    //   x: GetPosition().x            -> body centred over the collider.
+    //   y: the feet sit at y=137 in a 192px cell, i.e. 137-96 = 41px below the
+    //      frame centre; the collider bottom (ground contact) is BASE_BOX_H/2 =
+    //      32px below GetPosition(). Drop the centre by (32-41) = -9px so the
+    //      feet land on the ground. Scales with the character so feet stay put.
     D3DXVECTOR2 worldPos = GetPosition();
-    worldPos.x += spriteOffset.x * charScale;
-    worldPos.y += spriteOffset.y * charScale;
+    worldPos.y += (32.0f - 41.0f) * charScale;
 
     sprite.Draw(graphics, camera, worldPos, scl);
 }

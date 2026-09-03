@@ -27,8 +27,6 @@ private:
     static const int BASE_BOX_H = 64;
     float charScale;     // uniform character zoom (item pickups resize this)
 
-    // Sprite offset tuning
-    D3DXVECTOR2 spriteOffset;
 
     // Animation Track IDs based on your team's old sprite sheet
     enum AnimState { IDLE = 0, RUN = 1, ATTACK = 2 };
