@@ -14,6 +14,16 @@ private:
     LPDIRECT3DTEXTURE9 spriteSheet;
     Sprite sprite;   // reusable renderer for the warrior sprite sheet
 
+    struct AnimBlock {
+        int startCol;
+        int startRow;
+        int cols;
+        int count;
+    };
+    AnimBlock idleAnim;
+    AnimBlock runAnim;
+    AnimBlock attackAnim;
+
     // Player specific stats
     float moveSpeed;
     float jumpForce;
@@ -27,6 +37,8 @@ private:
     static const int BASE_BOX_H = 64;
     float charScale;     // uniform character zoom (item pickups resize this)
 
+    // Sprite offset tuning
+    D3DXVECTOR2 spriteOffset;
 
     // Animation Track IDs based on your team's old sprite sheet
     enum AnimState { IDLE = 0, RUN = 1, ATTACK = 2 };
@@ -44,7 +56,7 @@ public:
     // Kept separate from UpdateLogic so the PlayState can control the execution order
     void ResolveMapCollisions(TileMap* map);
 
-    void RenderFrame(Graphics* graphics, Camera* camera) override;   // overrides GameObject::RenderFrame
+    void RenderFrame(Graphics* graphics, Camera* camera);
 
     // ---- World-space helpers used by the gameplay states ----
     // Position is the CENTRE of the collider box, so feet = centre + halfHeight.
