@@ -1,4 +1,6 @@
 #include "AudioManager.h"
+//set volume 以外的audio东西
+
 
 AudioManager::AudioManager()
 {
