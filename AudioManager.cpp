@@ -7,6 +7,7 @@ AudioManager::AudioManager()
     sound2      = 0;
     jumpSfx     = 0;
     slashSfx    = 0;
+    bossAttackSfx = 0;
     map1BGM     = 0;
     channel     = 0;
     bgmChannel  = 0;
@@ -54,6 +55,9 @@ void AudioManager::loadSounds()                     // check the asset paths
 
     result = system->createSound("Assets/SoundEffect/SwordSlash.wav", FMOD_DEFAULT, 0, &slashSfx);
     if (slashSfx) result = slashSfx->setMode(FMOD_LOOP_OFF);
+
+    result = system->createSound("Assets/Boss/67_bossAttackSoundEffect.wav", FMOD_DEFAULT, 0, &bossAttackSfx);
+    if (bossAttackSfx) result = bossAttackSfx->setMode(FMOD_LOOP_OFF);
 
     // Looping level music.
     result = system->createStream("Assets/BGM/Map1BGM.wav", FMOD_LOOP_NORMAL, 0, &map1BGM);
@@ -105,6 +109,11 @@ void AudioManager::playJump()                       // PlayerJump.wav via SFX gr
 void AudioManager::playSlash()                      // SwordSlash.wav via SFX group
 {
     result = system->playSound(slashSfx, sfxGroup, false, &channel);
+}
+
+void AudioManager::playBossAttack()                 // 67_bossAttackSoundEffect.wav via SFX group
+{
+    result = system->playSound(bossAttackSfx, sfxGroup, false, &channel);
 }
 
 void AudioManager::playSound2()                     // (legacy) 67.wav via SFX group

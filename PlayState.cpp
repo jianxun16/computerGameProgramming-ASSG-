@@ -11,6 +11,7 @@
 #include "EndState.h"
 #include "AudioManager.h"
 #include "GameLog.h"
+#include "Cheat.h"
 
 // 2x2 translucent red, stretched over the screen on game over.
 static LPDIRECT3DTEXTURE9 MakeRedOverlay(IDirect3DDevice9* device)
@@ -111,7 +112,7 @@ void PlayState::update(InputManager* input)
     player->getWorldHitbox(hl, ht, hr, hb);
     bool fell   = player->getFeetY() > TileMap::ROWS * TileMap::TILE;
     bool spiked = tileMap->rectSpike(hl, ht, hr, hb);
-    if (fell || spiked)
+    if ((fell || spiked) && !Cheat::enabled())   // god mode ignores pit + spikes
     {
         gameOver = true;   // freezes this state; Lose menu takes over
         GameLog(fell ? "Player fell into the pit -> Game Over"

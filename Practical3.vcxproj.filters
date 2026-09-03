@@ -30,6 +30,9 @@
     <ClCompile Include="BossState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Cheat.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="EndState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -81,6 +84,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BossState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Cheat.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EndState.h">

@@ -157,6 +157,7 @@
     <ClCompile Include="AudioManager.cpp" />
     <ClCompile Include="Background.cpp" />
     <ClCompile Include="BossState.cpp" />
+    <ClCompile Include="Cheat.cpp" />
     <ClCompile Include="EndState.cpp" />
     <ClCompile Include="FrameTimer.cpp" />
     <ClCompile Include="Game.cpp" />
@@ -178,6 +179,7 @@
     <ClInclude Include="AudioManager.h" />
     <ClInclude Include="Background.h" />
     <ClInclude Include="BossState.h" />
+    <ClInclude Include="Cheat.h" />
     <ClInclude Include="EndState.h" />
     <ClInclude Include="FrameTimer.h" />
     <ClInclude Include="Game.h" />

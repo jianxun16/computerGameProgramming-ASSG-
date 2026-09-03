@@ -14,6 +14,7 @@ public:
     FMOD::Sound         *sound1, *sound2;      // (legacy)
     FMOD::Sound         *jumpSfx;              // PlayerJump.wav  (Space)
     FMOD::Sound         *slashSfx;             // SwordSlash.wav  (left click)
+    FMOD::Sound         *bossAttackSfx;        // 67_bossAttackSoundEffect.wav (boss throw)
     FMOD::Sound         *map1BGM;              // looping level music
     FMOD::Channel       *channel;              // last SFX channel
     FMOD::Channel       *bgmChannel;           // current music channel
@@ -29,6 +30,7 @@ public:
     // ----- Sound effects (via sfxGroup) -----
     void playJump();                           // PlayerJump.wav  (Space)
     void playSlash();                          // SwordSlash.wav  (left click)
+    void playBossAttack();                     // 67_bossAttackSoundEffect.wav (boss throw)
     void playSound2();                         // (legacy)
     void playSoundtrack();
 

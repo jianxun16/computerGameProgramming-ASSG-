@@ -4,6 +4,7 @@
 #include "PlayState.h"
 #include "FrameTimer.h"
 #include "AudioManager.h"
+#include "Cheat.h"
 
 // Boot state: true = menu, false = straight into the game.
 static const bool START_IN_MENU = true;
@@ -49,6 +50,7 @@ void Game::run()
     while (window.processMessages())
     {
         inp.update();                  // 1. Input
+        Cheat::pollConsole();          // console cheat code -> toggle god mode
         update();                      // 2. Physics + Update
         render();                      // 3. Render
         audioManager->updateSound();   // 4. Sound
