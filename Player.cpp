@@ -13,7 +13,11 @@ Player::Player() {
 
     // Offset the sprite so the bottom-center of the character visually 
     // aligns with the mathematical center of the Physics box
-    spriteOffset = D3DXVECTOR2(-96.0f, -137.0f); // Derived from old FEET_CENTER_X and FEET_Y
+    spriteOffset = D3DXVECTOR2(-100.0f, -105.0f); // Derived from old FEET_CENTER_X and FEET_Y
+
+    idleAnim = { 0, 0, 3, 8 };
+    attackAnim = { 3, 0, 2, 4 };
+    runAnim = { 0, 3, 3, 6 };
 }
 
 Player::~Player() {
@@ -45,11 +49,12 @@ void Player::ChangeState(AnimState newState) {
 }
 
 void Player::UpdateLogic(Input* input, float deltaTime, AudioManager* audio) {
-    // 1. Get current velocity from the physics base
     D3DXVECTOR2 vel = GetVelocity();
 
-    // 2. Horizontal Input
-    vel.x = 0.0f; // Reset horizontal every frame (no ice-skating)
+    // 1. Horizontal Input
+    // Platformers usually override X velocity directly for crisp, responsive controls 
+    // rather than using gradual force/friction.
+    vel.x = 0.0f;
     if (input->IsKeyDown(DIK_A)) {
         vel.x = -moveSpeed;
         facingLeft = true;
@@ -59,21 +64,27 @@ void Player::UpdateLogic(Input* input, float deltaTime, AudioManager* audio) {
         facingLeft = false;
     }
 
-    // 3. Jump Input
+    // 2. Jump Input
     if (input->IsKeyJustPressed(DIK_SPACE) && !isJumping) {
-        vel.y = jumpForce;
+        vel.y = jumpForce; // Direct velocity impulse for the jump
         isJumping = true;
         if (audio) audio->Play("JumpSFX");
     }
 
-    // 4. Attack Input (one-shot: fires an attack that lasts attackTimer seconds)
+    // Save the snappy input velocity back to the physics base before integration
+    SetVelocity(vel);
+
+    // 3. Apply Gravity
+    // Pass a pure downward vector. The PhysicsObject calculates the mass and delta time.
+    ApplyGravity(D3DXVECTOR2(0.0f, 100.0f));
+
+    // 4. Attack Input
     if (input->IsMouseButtonJustPressed(0) && !isAttacking) {
         isAttacking = true;
-        attackTimer = 0.30f;   // attack (and its hit circle) stays active this long
+        attackTimer = 0.30f;
         if (audio) audio->Play("SlashSFX");
     }
 
-    // Tick the one-shot attack down; clear it when the swing finishes.
     if (isAttacking) {
         attackTimer -= deltaTime;
         if (attackTimer <= 0.0f) {
@@ -83,65 +94,69 @@ void Player::UpdateLogic(Input* input, float deltaTime, AudioManager* audio) {
     }
 
     // 5. Determine Animation State
-    if (isAttacking) {
-        ChangeState(ATTACK);
-    }
-    else if (vel.x != 0.0f) {
-        ChangeState(RUN);
-    }
-    else {
-        ChangeState(IDLE);
-    }
+    if (isAttacking) ChangeState(ATTACK);
+    else if (vel.x != 0.0f) ChangeState(RUN);
+    else ChangeState(IDLE);
 
-    // 6. Apply Gravity and Update Base Object
-    ApplyGravity(D3DXVECTOR2(0, 980.0f * deltaTime)); // 9.8 scaled for pixels
-    SetVelocity(vel);
-
-    // PhysicsObject::UpdateLogic will apply the velocity to the Position
+    // 6. Let the OOP Framework handle the movement!
     PhysicsObject::UpdateLogic(deltaTime);
 
-    // 7. Tick the animation clock
+    // 7. Tick animations
     anim.Update(deltaTime);
 }
 
 void Player::ResolveMapCollisions(TileMap* map) {
-    if (!map) return;
-
     D3DXVECTOR2 pos = GetPosition();
     D3DXVECTOR2 vel = GetVelocity();
+
+    // Failsafe Floor (Prevents infinite falling if map fails to load)
+    if (pos.y > 600.0f) {
+        pos.y = 600.0f;
+        vel.y = 0.0f;
+        isJumping = false;
+    }
+
+    if (!map) {
+        SetPosition(pos);
+        SetVelocity(vel);
+        return;
+    }
 
     float halfW = GetBoxWidth() / 2.0f;
     float halfH = GetBoxHeight() / 2.0f;
 
-    // Check floor collision (falling down)
+    // Floor Collision (Falling down)
     if (vel.y > 0) {
-        // We check a small box right under the player's feet
-        if (map->rectSolid(pos.x - halfW, pos.y + halfH, pos.x + halfW, pos.y + halfH + 4.0f)) {
-            // Snap to the top of the tile grid (Assuming 64x64 tiles)
-            int tileRow = (int)((pos.y + halfH) / 64);
-            pos.y = (tileRow * 64) - halfH;
-
+        // Shaving 4 pixels off the sides prevents getting stuck on wall seams
+        if (map->rectSolid(pos.x - halfW + 4.0f, pos.y + halfH - 4.0f, pos.x + halfW - 4.0f, pos.y + halfH)) {
+            int tileRow = (int)floorf((pos.y + halfH) / TileMap::TILE);
+            pos.y = (tileRow * (float)TileMap::TILE) - halfH; // Instantly push out of the floor
             vel.y = 0;
             isJumping = false;
         }
     }
-
-    // Check head collision (jumping up into a ceiling)
-    if (vel.y < 0) {
-        if (map->rectSolid(pos.x - halfW, pos.y - halfH - 4.0f, pos.x + halfW, pos.y - halfH)) {
-            vel.y = 0; // Stop upward momentum
+    // Ceiling Collision (Jumping up)
+    else if (vel.y < 0) {
+        if (map->rectSolid(pos.x - halfW + 4.0f, pos.y - halfH - 4.0f, pos.x + halfW - 4.0f, pos.y - halfH + 4.0f)) {
+            int tileRow = (int)floorf((pos.y - halfH) / TileMap::TILE);
+            pos.y = ((tileRow + 1) * (float)TileMap::TILE) + halfH; // Eject downwards
+            vel.y = 0;
         }
     }
 
-    // Check wall collisions (moving left/right)
-    // Note: A robust engine checks X and Y axis resolutions separately to slide along walls.
+    // Right Wall Collision
     if (vel.x > 0) {
-        if (map->rectSolid(pos.x + halfW, pos.y - halfH + 4.0f, pos.x + halfW + 4.0f, pos.y + halfH - 4.0f)) {
+        if (map->rectSolid(pos.x + halfW - 4.0f, pos.y - halfH + 4.0f, pos.x + halfW, pos.y + halfH - 4.0f)) {
+            int tileCol = (int)floorf((pos.x + halfW) / TileMap::TILE);
+            pos.x = (tileCol * (float)TileMap::TILE) - halfW; // Eject left
             vel.x = 0;
         }
     }
+    // Left Wall Collision
     else if (vel.x < 0) {
-        if (map->rectSolid(pos.x - halfW - 4.0f, pos.y - halfH + 4.0f, pos.x - halfW, pos.y + halfH - 4.0f)) {
+        if (map->rectSolid(pos.x - halfW, pos.y - halfH + 4.0f, pos.x - halfW + 4.0f, pos.y + halfH - 4.0f)) {
+            int tileCol = (int)floorf((pos.x - halfW) / TileMap::TILE);
+            pos.x = ((tileCol + 1) * (float)TileMap::TILE) + halfW; // Eject right
             vel.x = 0;
         }
     }
@@ -149,27 +164,51 @@ void Player::ResolveMapCollisions(TileMap* map) {
     SetPosition(pos);
     SetVelocity(vel);
 }
-
 void Player::RenderFrame(Graphics* graphics, Camera* camera) {
     if (!spriteSheet) return;
 
-    // Point the Sprite at the current animation frame of the sheet.
-    sprite.SetTexture(spriteSheet);
-    sprite.SetSourceRect(anim.GetSourceRect());
+    // 1. CUSTOM BLOCK ANIMATION SLICING
+    // Grab the correct block bounds based on your current state
+    int frame = anim.GetCurrentFrame();
+    AnimBlock block = idleAnim;
+    if (currentState == ATTACK) block = attackAnim;
+    else if (currentState == RUN) block = runAnim;
 
-    // Flip horizontally when facing left, and apply the uniform character zoom.
-    // A negative scale.x mirrors the sprite around its (top-left) origin.
+    // Math to wrap frames across rows inside the specific block
+    frame = frame % block.count;
+    int localCol = frame % block.cols;
+    int localRow = frame / block.cols;
+
+    int finalCol = block.startCol + localCol;
+    int finalRow = block.startRow + localRow;
+
+    // Set the 192x192 cell
+    RECT srcRect = { finalCol * 192, finalRow * 192, (finalCol + 1) * 192, (finalRow + 1) * 192 };
+
+    // 2. CALCULATE SCREEN POSITION
+    D3DXVECTOR2 screenPos = GetPosition();
+    if (camera) {
+        screenPos.x -= camera->GetPosition().x;
+        screenPos.y -= camera->GetPosition().y;
+    }
+
+    // 3. MATRIX MATH (Fixes the backwards teleport bug)
+    D3DXMATRIX toOrigin, scaleMat, toScreen, finalMat;
+
+    // Move origin to the visual center/feet of the 192x192 cell (-96, -137)
+    D3DXMatrixTranslation(&toOrigin, spriteOffset.x, spriteOffset.y, 0.0f);
+
+    // Scale and flip horizontally around that new center origin
     float scaleX = (facingLeft ? -1.0f : 1.0f) * charScale;
-    D3DXVECTOR2 scl(scaleX, charScale);
+    D3DXMatrixScaling(&scaleMat, scaleX, charScale, 1.0f);
 
-    // spriteOffset is the box-centre -> sprite top-left vector; it scales with
-    // the character so the feet stay planted as the warrior grows / shrinks.
-    // We add it in world space and let the camera do the scrolling.
-    D3DXVECTOR2 worldPos = GetPosition();
-    worldPos.x += spriteOffset.x * charScale;
-    worldPos.y += spriteOffset.y * charScale;
+    // Translate the anchored, scaled sprite to the actual screen coordinates
+    D3DXMatrixTranslation(&toScreen, screenPos.x, screenPos.y, 0.0f);
 
-    sprite.Draw(graphics, camera, worldPos, scl);
+    finalMat = toOrigin * scaleMat * toScreen;
+
+    // 4. DRAW
+    graphics->DrawSprite(spriteSheet, &srcRect, &finalMat);
 }
 
 void Player::GetWorldHitbox(float& left, float& top, float& right, float& bottom) const {

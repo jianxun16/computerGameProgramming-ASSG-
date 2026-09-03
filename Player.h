@@ -14,6 +14,16 @@ private:
     LPDIRECT3DTEXTURE9 spriteSheet;
     Sprite sprite;   // reusable renderer for the warrior sprite sheet
 
+    struct AnimBlock {
+        int startCol;
+        int startRow;
+        int cols;
+        int count;
+    };
+    AnimBlock idleAnim;
+    AnimBlock runAnim;
+    AnimBlock attackAnim;
+
     // Player specific stats
     float moveSpeed;
     float jumpForce;
