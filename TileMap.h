@@ -10,7 +10,7 @@ class TileMap
 {
 public:
     static const int TILE = 64;
-    static const int ROWS = 9;
+    static const int ROWS = 12;
     static const int COLS = 28;
 
     

@@ -101,8 +101,13 @@ void BossState::UpdateLogic(Input* input, float deltaTime) {
     // Player walked into a spike -> LOSE (skipped in cheat / god mode).
     if (!Cheat::enabled() && map.rectSpike(hl, ht, hr, hb)) {
         GameLog("Player hit a spike in the boss room -> Game Over");
+        GameLog("DBG: before StopBGM");                            // DEBUG
         engine->GetAudio()->StopBGM();
-        engine->GetStateManager()->PushState(new EndState(EndState::RESULT_LOSE));
+        GameLog("DBG: after StopBGM, before new EndState");        // DEBUG
+        GameState* es = new EndState(EndState::RESULT_LOSE);
+        GameLog("DBG: after new EndState, before PushState");      // DEBUG
+        engine->GetStateManager()->PushState(es);
+        GameLog("DBG: after PushState (queued OK)");               // DEBUG
         ended = true;
         return;
     }
@@ -112,8 +117,13 @@ void BossState::UpdateLogic(Input* input, float deltaTime) {
         if (attackHitsBoss()) {
             bossAlive = false;
             GameLog("Player struck the boss -> boss defeated -> Victory");
+            GameLog("DBG(win): before StopBGM");                       // DEBUG
             engine->GetAudio()->StopBGM();
-            engine->GetStateManager()->PushState(new EndState(EndState::RESULT_WIN));
+            GameLog("DBG(win): after StopBGM, before new EndState");   // DEBUG
+            GameState* es = new EndState(EndState::RESULT_WIN);
+            GameLog("DBG(win): after new EndState, before PushState"); // DEBUG
+            engine->GetStateManager()->PushState(es);
+            GameLog("DBG(win): after PushState (queued OK)");          // DEBUG
             ended = true;
             return;
         }
@@ -140,6 +150,7 @@ void BossState::UpdateLogic(Input* input, float deltaTime) {
                 GameLog("A boss ball hit the player -> Game Over");
                 engine->GetAudio()->StopBGM();
                 engine->GetStateManager()->PushState(new EndState(EndState::RESULT_LOSE));
+                GameLog("BossState(ball): PushState(EndState) queued");   // DEBUG
                 ended = true;
                 return;
             }
@@ -327,6 +338,18 @@ void BossState::resolveBallPair(Ball& a, Ball& b) {
 bool BossState::ballHitsPlayer(const Ball& b) const {
     float hl, ht, hr, hb;
     player.GetWorldHitbox(hl, ht, hr, hb);
+
+    // The collider box (32x64 at scale 1) only covers the warrior's torso, but
+    // the warrior is DRAWN from a much larger 192x192 sprite cell, so a ball can
+    // clearly touch the visible knight (helmet / shield / sword) yet miss the
+    // tiny box -> no LOSE. Grow the box into a "hurt box" that matches the drawn
+    // character (scaled with item pickups) so a visible hit actually counts.
+    float s     = player.GetScale();
+    float padX  = 26.0f * s;   // widen out to the shield / sword / body edges
+    float padUp = 34.0f * s;   // reach up to the helmet
+    hl -= padX;  hr += padX;
+    ht -= padUp;               // the box bottom already sits near the feet
+
     return circleVsBox(b.x, b.y, b.radius, hl, ht, hr, hb);
 }
 
@@ -357,6 +380,8 @@ bool BossState::circleVsBox(float cx, float cy, float r,
 }
 
 void BossState::RenderFrame(Graphics* graphics) {
+    if (ended) { static bool r = false; if (!r) { GameLog("DBG: Boss RenderFrame START while ended"); r = true; } }   // DEBUG
+
     Camera* camera = engine->GetCamera();
     float cameraX = camera->GetPosition().x;
 
@@ -390,4 +415,6 @@ void BossState::RenderFrame(Graphics* graphics) {
     }
 
     player.RenderFrame(graphics, camera);
+
+    if (ended) { static bool r = false; if (!r) { GameLog("DBG: Boss RenderFrame END while ended"); r = true; } }   // DEBUG
 }

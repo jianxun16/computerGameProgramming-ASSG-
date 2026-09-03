@@ -6,6 +6,8 @@
 void EndState::Initialize(GameEngine* eng) {
     GameState::Initialize(eng);
 
+    GameLog("EndState::Initialize CALLED (result=%d)", (int)result);   // DEBUG
+
     // A crisp font for the title / button label.
     engine->GetGraphics()->LoadFont("Arial", 28, FW_BOLD);
 
@@ -44,6 +46,9 @@ void EndState::UpdateLogic(Input* input, float deltaTime) {
 }
 
 void EndState::RenderFrame(Graphics* graphics) {
+    static bool loggedOnce = false;                     // DEBUG
+    if (!loggedOnce) { GameLog("EndState::RenderFrame CALLED"); loggedOnce = true; }
+
     float W = (float)engine->GetScreenWidth();
     float H = (float)engine->GetScreenHeight();
 
