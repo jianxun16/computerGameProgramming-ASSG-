@@ -61,15 +61,15 @@ void AudioManager::Play(const string& key, SoundType type) {
 }
 
 
-void AudioManager::PlayJumpSFX(float pitch) {
-    auto it = soundMap.find("JumpSFX");             
+void AudioManager::PlayPitchSFX(const string& key, float pitch) {
+    auto it = soundMap.find(key);                   
     if (it == soundMap.end() || it->second == NULL) return;
 
     FMOD::Channel* ch = NULL;
     system->playSound(it->second, sfxGroup, true, &ch); // pause first
     if (ch) {
-        ch->setPitch(2);     // speed up
-        ch->setPaused(false);    // then continue
+        ch->setPitch(pitch);      
+        ch->setPaused(false);     //continue
     }
 }
 

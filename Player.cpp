@@ -68,7 +68,7 @@ void Player::UpdateLogic(Input* input, float deltaTime, AudioManager* audio) {
     if (input->IsKeyJustPressed(DIK_SPACE) && !isJumping) {
         vel.y = jumpForce; // Direct velocity impulse for the jump
         isJumping = true;
-        if (audio) audio->PlayJumpSFX();        // 默认 1.5 倍速
+        if (audio) audio->PlayPitchSFX("JumpSFX",2);
     }
 
     // Save the snappy input velocity back to the physics base before integration

@@ -33,7 +33,7 @@ public:
     // for sfx
     void Play(const string& key, SoundType type = SFX);
 
-    void PlayJumpSFX(float pitch = 1.5f);   // Speed Up JumpSoundEffect
+    void PlayPitchSFX(const string& key, float pitch);
 
     void StopBGM();
 
