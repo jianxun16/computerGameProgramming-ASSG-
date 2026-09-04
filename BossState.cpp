@@ -230,8 +230,8 @@ void BossState::fireBallPair() {
     // Boss throw sound effect.
     float playerCY = (pt + pb) * 0.5f;
     engine->GetAudio()->PlaySFXAt("BossAttack",
-        playerCX, playerCY,   // 听者 = 玩家
-        cx, cy,               // 音源 = boss
+        playerCX, playerCY,   // to
+        cx, cy,               // from
         100, 800);
 }
 
