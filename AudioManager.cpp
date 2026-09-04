@@ -1,4 +1,5 @@
 #include "AudioManager.h"
+#include "GameLog.h"
 
 using namespace std;
 
@@ -61,8 +62,13 @@ void AudioManager::Play(const string& key, SoundType type) {
 }
 
 void AudioManager::StopBGM() {
-    if (bgmGroup) bgmGroup->stop();
+    GameLog("DBG-audio: StopBGM enter  system=%p bgmGroup=%p", (void*)system, (void*)bgmGroup);   // DEBUG
+    if (bgmGroup) {
+        FMOD_RESULT r = bgmGroup->stop();
+        GameLog("DBG-audio: bgmGroup->stop() returned %d", (int)r);   // DEBUG
+    }
     bgmChannel = NULL;
+    GameLog("DBG-audio: StopBGM done");   // DEBUG
 }
 
 void AudioManager::SetMusicVolume(float v) {

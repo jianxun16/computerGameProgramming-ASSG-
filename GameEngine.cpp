@@ -1,5 +1,6 @@
 #include "GameEngine.h"
 #include "Cheat.h"
+#include "GameLog.h"
 #include <iostream>
 
 using namespace std;
@@ -64,29 +65,42 @@ void GameEngine::Run() {
         Cheat::pollConsole();
 
         int ticks = timer.FrameToUpdate();
-        for (int i = 0; i < ticks; i++) {
 
-            // input
+        // Guard against the "spiral of death". If the game stalls for even a
+        // moment (a heavier frame when an overlay is pushed, a slow state
+        // Initialize / LoadFont, an alt-tab, a breakpoint), FrameToUpdate returns
+        // a big backlog of ticks. The old loop rendered inside this catch-up loop,
+        // and every render blocks on the vsync Present -- so a large backlog kept
+        // the loop busy for seconds, the Windows message pump never ran, and the
+        // window went "Not Responding" (the boss-room pause / victory freeze).
+        // Cap the catch-up so we can never fall into that hole.
+        const int MAX_TICKS = 5;
+        if (ticks > MAX_TICKS) {
+            GameLog("DBG: tick backlog=%d (clamped to %d)", ticks, MAX_TICKS);   // DEBUG
+            ticks = MAX_TICKS;
+        }
+
+        // ---- Update only: fixed timestep, run a few times to catch up. ----
+        for (int i = 0; i < ticks; i++) {
             input.PollDeviceStates();
 
-            // physics and update
             GameState* active = stateManager.GetActiveState();
             if (active) active->UpdateLogic(&input, fixedDt);
 
-            // render the whole stack so overlays (pause / end) sit on the frozen scene
-            graphics.BeginRender(0, 0, 0);
-            stateManager.RenderAll(&graphics);
-            graphics.EndRender();
-
-            // sound
-            audio.UpdateSound();
-
-            // state
+            // Apply queued pushes/pops right away so each tick sees a settled stack.
             stateManager.ApplyPendingTransitions();
         }
+
+        audio.UpdateSound();
         if (camera) camera->Update();
 
-
+        // ---- Render exactly ONCE per frame, OUTSIDE the catch-up loop. ----
+        // Present blocks on vsync, so it must never sit inside the catch-up loop.
+        // The whole stack is drawn bottom -> top so overlays (pause / end) sit on
+        // the frozen scene below them.
+        graphics.BeginRender(0, 0, 0);
+        stateManager.RenderAll(&graphics);
+        graphics.EndRender();
     }
 }
 
