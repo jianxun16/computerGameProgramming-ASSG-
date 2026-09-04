@@ -1,5 +1,4 @@
 #include "AudioManager.h"
-#include "GameLog.h"
 
 using namespace std;
 
@@ -61,14 +60,25 @@ void AudioManager::Play(const string& key, SoundType type) {
     }
 }
 
-void AudioManager::StopBGM() {
-    GameLog("DBG-audio: StopBGM enter  system=%p bgmGroup=%p", (void*)system, (void*)bgmGroup);   // DEBUG
-    if (bgmGroup) {
-        FMOD_RESULT r = bgmGroup->stop();
-        GameLog("DBG-audio: bgmGroup->stop() returned %d", (int)r);   // DEBUG
+
+void AudioManager::PlayJumpSFX(float pitch) {
+    auto it = soundMap.find("JumpSFX");             
+    if (it == soundMap.end() || it->second == NULL) return;
+
+    FMOD::Channel* ch = NULL;
+    system->playSound(it->second, sfxGroup, true, &ch); // pause first
+    if (ch) {
+        ch->setPitch(2);     // speed up
+        ch->setPaused(false);    // then continue
     }
+}
+
+
+
+
+void AudioManager::StopBGM() {
+    if (bgmGroup) bgmGroup->stop();
     bgmChannel = NULL;
-    GameLog("DBG-audio: StopBGM done");   // DEBUG
 }
 
 void AudioManager::SetMusicVolume(float v) {

@@ -1,5 +1,4 @@
 #include "StateManager.h"
-#include "GameLog.h"
 
 StateManager::StateManager() {
     engine = NULL;
@@ -26,14 +25,10 @@ void StateManager::PopToBottom() {
 }
 
 void StateManager::ApplyPendingTransitions() {
-    if (!pending.empty())
-        GameLog("StateManager: applying %d pending transition(s), stack=%d",
-                (int)pending.size(), (int)stateStack.size());   // DEBUG
     for (size_t i = 0; i < pending.size(); i++) {
         Pending& p = pending[i];
 
         if (p.type == P_PUSH) {
-            GameLog("StateManager: P_PUSH -> initializing new state");   // DEBUG
             // pause then push
             if (!stateStack.empty()) {
                 stateStack.back()->Pause();

@@ -101,13 +101,8 @@ void BossState::UpdateLogic(Input* input, float deltaTime) {
     // Player walked into a spike -> LOSE (skipped in cheat / god mode).
     if (!Cheat::enabled() && map.rectSpike(hl, ht, hr, hb)) {
         GameLog("Player hit a spike in the boss room -> Game Over");
-        GameLog("DBG: before StopBGM");                            // DEBUG
         engine->GetAudio()->StopBGM();
-        GameLog("DBG: after StopBGM, before new EndState");        // DEBUG
-        GameState* es = new EndState(EndState::RESULT_LOSE);
-        GameLog("DBG: after new EndState, before PushState");      // DEBUG
-        engine->GetStateManager()->PushState(es);
-        GameLog("DBG: after PushState (queued OK)");               // DEBUG
+        engine->GetStateManager()->PushState(new EndState(EndState::RESULT_LOSE));
         ended = true;
         return;
     }
@@ -117,13 +112,8 @@ void BossState::UpdateLogic(Input* input, float deltaTime) {
         if (attackHitsBoss()) {
             bossAlive = false;
             GameLog("Player struck the boss -> boss defeated -> Victory");
-            GameLog("DBG(win): before StopBGM");                       // DEBUG
             engine->GetAudio()->StopBGM();
-            GameLog("DBG(win): after StopBGM, before new EndState");   // DEBUG
-            GameState* es = new EndState(EndState::RESULT_WIN);
-            GameLog("DBG(win): after new EndState, before PushState"); // DEBUG
-            engine->GetStateManager()->PushState(es);
-            GameLog("DBG(win): after PushState (queued OK)");          // DEBUG
+            engine->GetStateManager()->PushState(new EndState(EndState::RESULT_WIN));
             ended = true;
             return;
         }
@@ -150,7 +140,6 @@ void BossState::UpdateLogic(Input* input, float deltaTime) {
                 GameLog("A boss ball hit the player -> Game Over");
                 engine->GetAudio()->StopBGM();
                 engine->GetStateManager()->PushState(new EndState(EndState::RESULT_LOSE));
-                GameLog("BossState(ball): PushState(EndState) queued");   // DEBUG
                 ended = true;
                 return;
             }
@@ -380,8 +369,6 @@ bool BossState::circleVsBox(float cx, float cy, float r,
 }
 
 void BossState::RenderFrame(Graphics* graphics) {
-    if (ended) { static bool r = false; if (!r) { GameLog("DBG: Boss RenderFrame START while ended"); r = true; } }   // DEBUG
-
     Camera* camera = engine->GetCamera();
     float cameraX = camera->GetPosition().x;
 
@@ -415,6 +402,4 @@ void BossState::RenderFrame(Graphics* graphics) {
     }
 
     player.RenderFrame(graphics, camera);
-
-    if (ended) { static bool r = false; if (!r) { GameLog("DBG: Boss RenderFrame END while ended"); r = true; } }   // DEBUG
 }

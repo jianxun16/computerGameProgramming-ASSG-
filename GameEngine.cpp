@@ -1,6 +1,5 @@
 #include "GameEngine.h"
 #include "Cheat.h"
-#include "GameLog.h"
 #include <iostream>
 
 using namespace std;
@@ -75,10 +74,7 @@ void GameEngine::Run() {
         // window went "Not Responding" (the boss-room pause / victory freeze).
         // Cap the catch-up so we can never fall into that hole.
         const int MAX_TICKS = 5;
-        if (ticks > MAX_TICKS) {
-            GameLog("DBG: tick backlog=%d (clamped to %d)", ticks, MAX_TICKS);   // DEBUG
-            ticks = MAX_TICKS;
-        }
+        if (ticks > MAX_TICKS) ticks = MAX_TICKS;
 
         // ---- Update only: fixed timestep, run a few times to catch up. ----
         for (int i = 0; i < ticks; i++) {

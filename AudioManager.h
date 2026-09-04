@@ -32,12 +32,16 @@ public:
         bool isStream = false, bool loop = false);
     // for sfx
     void Play(const string& key, SoundType type = SFX);
+
+    void PlayJumpSFX(float pitch = 1.5f);   // Speed Up JumpSoundEffect
+
     void StopBGM();
 
     void  SetMusicVolume(float v);   // 0..1
     void  SetSFXVolume(float v);     // 0..1
     float GetMusicVolume() const { return bgmVolume; }
     float GetSFXVolume()   const { return sfxVolume; }
+
 
     void UpdateSound();
     void CleanUpAudio();
