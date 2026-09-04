@@ -35,6 +35,13 @@ public:
 
     void PlayPitchSFX(const string& key, float pitch);
 
+
+    void PlaySFXAt(const string& key,
+        float listenerX, float listenerY,
+        float sourceX, float sourceY,
+        float minDist, float maxDist 
+    );
+
     void StopBGM();
 
     void  SetMusicVolume(float v);   // 0..1

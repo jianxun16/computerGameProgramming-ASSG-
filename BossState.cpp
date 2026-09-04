@@ -228,12 +228,17 @@ void BossState::fireBallPair() {
     balls.push_back(ballBig);
 
     // Boss throw sound effect.
-    engine->GetAudio()->Play("BossAttack");
+    float playerCY = (pt + pb) * 0.5f;
+    engine->GetAudio()->PlaySFXAt("BossAttack",
+        playerCX, playerCY,   // 听者 = 玩家
+        cx, cy,               // 音源 = boss
+        100, 800);
 }
 
 void BossState::updateBalls(float frames) {
     for (size_t i = 0; i < balls.size(); i++) {
-        if (!balls[i].alive)
+        if 
+            (!balls[i].alive)
             continue;
 
         stepBall(balls[i], frames);

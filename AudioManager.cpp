@@ -73,6 +73,37 @@ void AudioManager::PlayPitchSFX(const string& key, float pitch) {
     }
 }
 
+void AudioManager::PlaySFXAt(const string& key,
+    float lx, float ly, float sx, float sy,
+    float minDist, float maxDist) {            
+
+    auto it = soundMap.find(key);
+    if (it == soundMap.end() || it->second == NULL) return;
+
+    float dx = lx - sx, dy = ly - sy;
+    float dist = sqrtf(dx * dx + dy * dy);
+
+    float volume;
+    if (dist <= minDist) 
+    {
+        volume = 1.0f;
+    }
+    else if (dist >= maxDist) 
+    {
+        volume = 0.0f;
+    }
+    else 
+    {
+        volume = 1.0f - (dist - minDist) / (maxDist - minDist); 
+    }
+
+    FMOD::Channel* ch = NULL;
+    system->playSound(it->second, sfxGroup, true, &ch);
+    if (ch) {
+        ch->setVolume(volume);
+        ch->setPaused(false);                 
+    }
+}
 
 
 
