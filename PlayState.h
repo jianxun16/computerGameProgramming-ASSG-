@@ -5,7 +5,8 @@
 #include "Background.h"
 #include "Camera.h"
 #include "Player.h"
-#include "ItemManager.h"
+#include "Sprite.h"
+#include <functional>
 
 class PlayState : public GameState {
 private:
@@ -13,8 +14,32 @@ private:
     Background background;
     string mapFile;
     string bgm;
+    // A collectable item, owned directly by the PlayState (was ItemManager).
+    // It does NOT know what it does -- the effect is a function injected in
+    // Initialize, and applyEffect() runs it when the player picks the item up.
+    // So the same Item type can be a mushroom, a tomato, or anything else.
+    struct Item {
+        Sprite sprite;                         // renderer for this item's texture
+        float  x = 0.0f, y = 0.0f;             // top-left in world coords
+        int    size = 64;                      // the 64x64 item cell
+        bool   active = false;
+        std::function<void(Player&)> effect;   // "what eating me does" (set in Initialize)
+
+        void applyEffect(Player& player) { if (effect) effect(player); }
+
+        bool overlaps(float pl, float pt, float pr, float pb) const {
+            return !(pr < x || pl > x + size || pb < y || pt > y + size);
+        }
+
+        void render(Graphics* graphics, Camera* camera) {
+            if (active && sprite.IsValid())
+                sprite.Draw(graphics, camera, D3DXVECTOR2(x, y));
+        }
+    };
+
     Player player;
-    ItemManager items;
+    Item mushroom;   // moved out of ItemManager into the state
+    Item tomato;
 
     bool enteredBoss;   // true once the boss room has been pushed (fires once)
 

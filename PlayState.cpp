@@ -15,7 +15,23 @@ void PlayState::Initialize(GameEngine* eng) {
 
     player.Initialize(engine->GetGraphics(), D3DXVECTOR2(300.0f, 400.0f));
 
-    items.load(engine->GetGraphics());
+    // Items now live here (was ItemManager). Each sits on the floor (floor top =
+    // row 7). The ONLY thing that makes a mushroom differ from a tomato is the
+    // effect we inject here -- the Item class itself is generic.
+    Graphics* gfx = engine->GetGraphics();
+    float onFloor = 7.0f * TileMap::TILE - 64;   // 64px item resting on the floor
+
+    tomato.sprite.SetTexture(gfx->LoadTexture("Assets/item/tomato.png"));
+    tomato.x = 11.0f * TileMap::TILE;
+    tomato.y = onFloor;
+    tomato.active = true;
+    tomato.effect = [](Player& p) { p.SetScale(p.GetScale() + 0.5f); };   // grow
+
+    mushroom.sprite.SetTexture(gfx->LoadTexture("Assets/item/mushroom.png"));
+    mushroom.x = 20.0f * TileMap::TILE;
+    mushroom.y = onFloor;
+    mushroom.active = true;
+    mushroom.effect = [](Player& p) { p.SetScale(p.GetScale() - 0.5f); };  // shrink
 
     enteredBoss = false;
 
@@ -49,8 +65,18 @@ void PlayState::UpdateLogic(Input* input, float deltaTime) {
     player.UpdateLogic(input, deltaTime, engine->GetAudio());
     player.ResolveMapCollisions(&map);
 
-    // Pick up any item the player overlaps (mushroom shrinks, tomato grows).
-    items.update(&player);
+    // Pick up any item the player overlaps. Each item just runs the effect that
+    // Initialize injected -- no mushroom/tomato check here.
+    float pl, pt, pr, pb;
+    player.GetWorldHitbox(pl, pt, pr, pb);
+    if (mushroom.active && mushroom.overlaps(pl, pt, pr, pb)) {
+        mushroom.applyEffect(player);
+        mushroom.active = false;
+    }
+    if (tomato.active && tomato.overlaps(pl, pt, pr, pb)) {
+        tomato.applyEffect(player);
+        tomato.active = false;
+    }
 
     // 3. Make the camera follow the player, clamping to the left edge
     D3DXVECTOR2 playerPos = player.GetPosition();
@@ -88,6 +114,7 @@ void PlayState::RenderFrame(Graphics* graphics) {
     map.render(graphics, engine->GetCamera(), engine->GetScreenWidth());
 
     // Draw the items, then the player
-    items.render(graphics, engine->GetCamera());
+    mushroom.render(graphics, engine->GetCamera());
+    tomato.render(graphics, engine->GetCamera());
     player.RenderFrame(graphics, engine->GetCamera());
 }
