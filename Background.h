@@ -12,14 +12,14 @@ public:
     Background();
     ~Background();
 
-    bool load(Graphics* graphics);
+    bool Load(Graphics* graphics);
 
-    void render(Graphics* graphics, Camera* camera);
+    void Render(Graphics* graphics, Camera* camera);
 
-    void release();
+    void Release();
 
 private:
-    void drawLayer(Graphics* graphics, float cameraX, int i);
+    void DrawLayer(Graphics* graphics, float cameraX, int i);
 
     LPDIRECT3DTEXTURE9 layerTexture[NUM_LAYERS];
     float parallaxFactor[NUM_LAYERS];

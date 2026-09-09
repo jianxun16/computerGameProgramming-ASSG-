@@ -8,7 +8,7 @@
 void PlayState::Initialize(GameEngine* eng) {
     GameState::Initialize(eng);
 
-    background.load(engine->GetGraphics());
+    background.Load(engine->GetGraphics());
 
     map.load(engine->GetGraphics(), mapFile.c_str());
 
@@ -16,18 +16,23 @@ void PlayState::Initialize(GameEngine* eng) {
 
     Graphics* gfx = engine->GetGraphics();
     float onFloor = 7.0f * TileMap::TILE - 64;   // 64px item resting on the floor
+    itemList.clear();
 
-    tomato.sprite.SetTexture(gfx->LoadTexture("Assets/item/tomato.png"));
+    Item tomato;
+    tomato.sprite.SetTexture(engine->GetGraphics()->LoadTexture("Assets/item/tomato.png"));
     tomato.x = 11.0f * TileMap::TILE;
     tomato.y = onFloor;
     tomato.active = true;
     tomato.effect = [](Player& p) { p.SetScale(p.GetScale() + 0.5f); };   // grow
+    itemList.push_back(tomato);
 
-    mushroom.sprite.SetTexture(gfx->LoadTexture("Assets/item/mushroom.png"));
+    Item mushroom;
+    mushroom.sprite.SetTexture(engine->GetGraphics()->LoadTexture("Assets/item/mushroom.png"));
     mushroom.x = 20.0f * TileMap::TILE;
     mushroom.y = onFloor;
     mushroom.active = true;
     mushroom.effect = [](Player& p) { p.SetScale(p.GetScale() - 0.5f); };  // shrink
+    itemList.push_back(mushroom);
 
     enteredBoss = false;
 
@@ -65,13 +70,11 @@ void PlayState::UpdateLogic(Input* input, float deltaTime) {
     // Initialize injected -- no mushroom/tomato check here.
     float pl, pt, pr, pb;
     player.GetWorldHitbox(pl, pt, pr, pb);
-    if (mushroom.active && mushroom.overlaps(pl, pt, pr, pb)) {
-        mushroom.applyEffect(player);
-        mushroom.active = false;
-    }
-    if (tomato.active && tomato.overlaps(pl, pt, pr, pb)) {
-        tomato.applyEffect(player);
-        tomato.active = false;
+    for (auto& item : itemList) {
+        if (item.active && item.Overlaps(pl, pt, pr, pb)) {
+            item.ApplyEffect(player);
+            item.active = false;
+        }
     }
 
     // 3. Make the camera follow the player, clamping to the left edge
@@ -106,11 +109,12 @@ void PlayState::UpdateLogic(Input* input, float deltaTime) {
 }
 
 void PlayState::RenderFrame(Graphics* graphics) {
-    background.render(graphics, engine->GetCamera());
+    background.Render(graphics, engine->GetCamera());
     map.render(graphics, engine->GetCamera(), engine->GetScreenWidth());
 
     // Draw the items, then the player
-    mushroom.render(graphics, engine->GetCamera());
-    tomato.render(graphics, engine->GetCamera());
+    for (auto& item : itemList) {
+        item.render(graphics, engine->GetCamera());
+    }
     player.RenderFrame(graphics, engine->GetCamera());
 }

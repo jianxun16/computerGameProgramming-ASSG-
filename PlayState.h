@@ -7,6 +7,7 @@
 #include "Player.h"
 #include "Sprite.h"
 #include <functional>
+#include <vector>
 
 class PlayState : public GameState {
 private:
@@ -25,9 +26,9 @@ private:
         bool   active = false;
         std::function<void(Player&)> effect;   // "what eating me does" (set in Initialize)
 
-        void applyEffect(Player& player) { if (effect) effect(player); }
+        void ApplyEffect(Player& player) { if (effect) effect(player); }
 
-        bool overlaps(float pl, float pt, float pr, float pb) const {
+        bool Overlaps(float pl, float pt, float pr, float pb) const {
             return !(pr < x || pl > x + size || pb < y || pt > y + size);
         }
 
@@ -38,8 +39,7 @@ private:
     };
 
     Player player;
-    Item mushroom;   // moved out of ItemManager into the state
-    Item tomato;
+    vector<Item> itemList;
 
     bool enteredBoss;   // true once the boss room has been pushed (fires once)
 

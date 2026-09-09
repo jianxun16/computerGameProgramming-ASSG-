@@ -36,7 +36,7 @@ BossState::BossState() {
 void BossState::Initialize(GameEngine* eng) {
     GameState::Initialize(eng);
 
-    background.load(engine->GetGraphics());
+    background.Load(engine->GetGraphics());
     map.load(engine->GetGraphics(), "Assets/Map/Map2.txt");   // boss arena
 
     // Spawn the warrior at the left entrance; gravity settles them onto the floor.
@@ -379,7 +379,7 @@ void BossState::RenderFrame(Graphics* graphics) {
     Camera* camera = engine->GetCamera();
     float cameraX = camera->GetPosition().x;
 
-    background.render(graphics, camera);
+    background.Render(graphics, camera);
     map.render(graphics, camera, engine->GetScreenWidth());
 
     // Living boss, scrolled with the room.
