@@ -6,7 +6,6 @@
 #include "Graphics.h"
 #include "Input.h"
 #include "AudioManager.h"
-#include "AssetManager.h"
 #include "FrameTimer.h"
 #include "Camera.h"
 #include "StateManager.h"
@@ -24,7 +23,6 @@ public:
     Graphics* GetGraphics() { return &graphics; }
     Input* GetInput() { return &input; }
     AudioManager* GetAudio() { return &audio; }
-    AssetManager* GetAssets() { return &assets; }
     Camera* GetCamera() { return camera; }
     StateManager* GetStateManager() { return &stateManager; }
 
@@ -38,7 +36,6 @@ private:
     Graphics      graphics;
     Input         input;
     AudioManager  audio;
-    AssetManager  assets;
     FrameTimer    timer;
     Camera* camera;       
     StateManager  stateManager;

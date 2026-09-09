@@ -104,8 +104,7 @@ void GameEngine::Shutdown() {
     stateManager.CleanUpStates();               
 
     if (camera) { delete camera; camera = NULL; }
-
-    assets.CleanUpAssets();                     
+                    
     audio.CleanUpAudio();                    
     input.CleanUpInput();                  
     graphics.CleanUpGraphics();        
