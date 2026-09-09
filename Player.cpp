@@ -149,7 +149,6 @@ void Player::ResolveMapCollisions(TileMap* map) {
     D3DXVECTOR2 pos = GetPosition();
     D3DXVECTOR2 vel = GetVelocity();
 
-    // Failsafe Floor (Prevents infinite falling if map fails to load)
     if (pos.y > 600.0f) {
         pos.y = 600.0f;
         vel.y = 0.0f;
@@ -162,15 +161,19 @@ void Player::ResolveMapCollisions(TileMap* map) {
         return;
     }
 
+    // OPTIMIZATION: Pre-calculate boundaries once
     float halfW = GetBoxWidth() / 2.0f;
     float halfH = GetBoxHeight() / 2.0f;
+    float left = pos.x - halfW;
+    float right = pos.x + halfW;
+    float top = pos.y - halfH;
+    float bottom = pos.y + halfH;
+    float inset = 4.0f; // Shave pixels to prevent seam-snagging
 
-    // Floor Collision (Falling down)
+    // Floor Collision
     if (vel.y > 0) {
-        // Shaving 4 pixels off the sides prevents getting stuck on wall seams
-        if (map->rectSolid(pos.x - halfW + 4.0f, pos.y + halfH - 4.0f, pos.x + halfW - 4.0f, pos.y + halfH)) {
-            int tileRow = (int)floorf((pos.y + halfH) / TileMap::TILE);
-            pos.y = (tileRow * (float)TileMap::TILE) - halfH; // Instantly push out of the floor
+        if (map->rectSolid(left + inset, bottom - inset, right - inset, bottom)) {
+            pos.y = ((int)floorf(bottom / TileMap::TILE) * (float)TileMap::TILE) - halfH;
             vel.y = 0;
             isJumping = false;
         }
@@ -204,51 +207,32 @@ void Player::ResolveMapCollisions(TileMap* map) {
     SetPosition(pos);
     SetVelocity(vel);
 }
+
 void Player::RenderFrame(Graphics* graphics, Camera* camera) {
     if (!spriteSheet) return;
 
-    // 1. CUSTOM BLOCK ANIMATION SLICING
-    // Grab the correct block bounds based on your current state
     int frame = anim.GetCurrentFrame();
     AnimBlock block = idleAnim;
     if (currentState == ATTACK) block = attackAnim;
     else if (currentState == RUN) block = runAnim;
 
-    // Math to wrap frames across rows inside the specific block
     frame = frame % block.count;
-    int localCol = frame % block.cols;
-    int localRow = frame / block.cols;
+    int finalCol = block.startCol + (frame % block.cols);
+    int finalRow = block.startRow + (frame / block.cols);
 
-    int finalCol = block.startCol + localCol;
-    int finalRow = block.startRow + localRow;
-
-    // Set the 192x192 cell
     RECT srcRect = { finalCol * 192, finalRow * 192, (finalCol + 1) * 192, (finalRow + 1) * 192 };
 
-    // 2. CALCULATE SCREEN POSITION
-    D3DXVECTOR2 screenPos = GetPosition();
-    if (camera) {
-        screenPos.x -= camera->GetPosition().x;
-        screenPos.y -= camera->GetPosition().y;
-    }
+    // Pass the texture and frame bounds to the Sprite helper
+    sprite.SetTexture(spriteSheet);
+    sprite.SetSourceRect(srcRect);
 
-    // 3. MATRIX MATH (Fixes the backwards teleport bug)
-    D3DXMATRIX toOrigin, scaleMat, toScreen, finalMat;
+    // Sprite negates the origin internally, so we pass the absolute offset values
+    sprite.SetOrigin(-spriteOffset.x, -spriteOffset.y);
 
-    // Move origin to the visual center/feet of the 192x192 cell (-96, -137)
-    D3DXMatrixTranslation(&toOrigin, spriteOffset.x, spriteOffset.y, 0.0f);
-
-    // Scale and flip horizontally around that new center origin
     float scaleX = (facingLeft ? -1.0f : 1.0f) * charScale;
-    D3DXMatrixScaling(&scaleMat, scaleX, charScale, 1.0f);
 
-    // Translate the anchored, scaled sprite to the actual screen coordinates
-    D3DXMatrixTranslation(&toScreen, screenPos.x, screenPos.y, 0.0f);
-
-    finalMat = toOrigin * scaleMat * toScreen;
-
-    // 4. DRAW
-    graphics->DrawSprite(spriteSheet, &srcRect, &finalMat);
+    // The Sprite class automatically applies the Camera view matrix inside Draw()
+    sprite.Draw(graphics, camera, GetPosition(), D3DXVECTOR2(scaleX, charScale));
 }
 
 void Player::GetWorldHitbox(float& left, float& top, float& right, float& bottom) const {

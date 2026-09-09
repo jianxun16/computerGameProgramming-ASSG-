@@ -108,7 +108,7 @@ void BossState::UpdateLogic(Input* input, float deltaTime) {
 
     if (bossAlive) {
         // One clean hit kills the boss -> WIN immediately.
-        if (attackHitsBoss()) {
+        if (AttackHitsBoss()) {
             bossAlive = false;
             GameLog("Player struck the boss -> boss defeated -> Victory");
             engine->GetAudio()->StopBGM();
@@ -120,22 +120,22 @@ void BossState::UpdateLogic(Input* input, float deltaTime) {
         // Boss stays put and auto-fires two balls at the player on a timer.
         fireTimer -= deltaTime;
         if (fireTimer <= 0.0f) {
-            fireBallPair();
+            FireBallPair();
             fireTimer = BALL_FIRE_INTERVAL;
         }
     }
 
     // Advance the balls in flight (real-time, scaled to the 1/32 s tuning).
     float frames = deltaTime * BOSS_FPS;
-    updateBalls(frames);
+    UpdateBalls(frames);
 
     // Player attack knocks any boss ball in range back out (defend by attacking).
-    deflectBalls();
+    DeflectBalls();
 
     // A boss ball touched the player -> LOSE (skipped in cheat / god mode).
     if (!player.IsGodMode()) {
         for (size_t i = 0; i < balls.size(); i++) {
-            if (balls[i].alive && ballHitsPlayer(balls[i])) {
+            if (balls[i].alive && BallHitsPlayer(balls[i])) {
                 GameLog("A boss ball hit the player -> Game Over");
                 engine->GetAudio()->StopBGM();
                 engine->GetStateManager()->PushState(new EndState(EndState::RESULT_LOSE));
@@ -147,17 +147,17 @@ void BossState::UpdateLogic(Input* input, float deltaTime) {
 }
 
 // Attack circle (world space) vs the boss box. Returns false when not attacking.
-bool BossState::attackHitsBoss() const {
+bool BossState::AttackHitsBoss() const {
     D3DXVECTOR2 centre;
     float r;
     if (!player.GetAttackCircleWorld(centre, r))
         return false;
-    return circleVsBox(centre.x, centre.y, r, bossX, bossY, bossX + bossW, bossY + bossH);
+    return CircleVsBox(centre.x, centre.y, r, bossX, bossY, bossX + bossW, bossY + bossH);
 }
 
 // While the player is attacking, any boss ball caught in the attack circle is
 // knocked away instead of hurting the player.
-void BossState::deflectBalls() {
+void BossState::DeflectBalls() {
     D3DXVECTOR2 centre;
     float r;
     if (!player.GetAttackCircleWorld(centre, r))
@@ -167,27 +167,30 @@ void BossState::deflectBalls() {
 
     for (size_t i = 0; i < balls.size(); i++) {
         Ball& b = balls[i];
-        if (!b.alive)
-            continue;
+        if (!b.alive) continue;
 
         float dx = b.x - centre.x;
         float dy = b.y - centre.y;
-        float dist = sqrtf(dx * dx + dy * dy);
-        if (dist > r + b.radius)
-            continue;   // this ball isn't inside the attack circle
+        float distSq = (dx * dx) + (dy * dy);
+        float limit = r + b.radius;
 
-        // Direction from the attack centre to the ball (fall back to straight up).
+        // OPTIMIZATION: Early exit using squared distance. No sqrtf required for misses!
+        if (distSq > limit * limit)
+            continue;
+
+        // Only calculate the expensive square root if we guarantee a hit, because we need it for normalized vectors
+        float dist = sqrtf(distSq);
         float nx = (dist > 0.0001f) ? dx / dist : 0.0f;
         float ny = (dist > 0.0001f) ? dy / dist : -1.0f;
 
         b.vx = nx * KNOCKBACK_SPEED;
-        b.vy = ny * KNOCKBACK_SPEED - 6.0f;   // add a little lift so it arcs away
+        b.vy = ny * KNOCKBACK_SPEED - 6.0f;
     }
 }
 
 // Boss auto-fires two "67" balls at once: one small (scale 1) and one big
 // (scale 1.6), both aimed toward the player. Skipped if the arena is full.
-void BossState::fireBallPair() {
+void BossState::FireBallPair() {
     int aliveCount = 0;
     for (size_t i = 0; i < balls.size(); i++)
         if (balls[i].alive) aliveCount++;
@@ -234,13 +237,13 @@ void BossState::fireBallPair() {
         100, 800);
 }
 
-void BossState::updateBalls(float frames) {
+void BossState::UpdateBalls(float frames) {
     for (size_t i = 0; i < balls.size(); i++) {
         if 
             (!balls[i].alive)
             continue;
 
-        stepBall(balls[i], frames);
+        StepBall(balls[i], frames);
 
         // Count down its 7-second life (frames / 32 = elapsed seconds).
         balls[i].life -= frames / BOSS_FPS;
@@ -252,7 +255,7 @@ void BossState::updateBalls(float frames) {
     for (size_t i = 0; i < balls.size(); i++)
         for (size_t j = i + 1; j < balls.size(); j++)
             if (balls[i].alive && balls[j].alive)
-                resolveBallPair(balls[i], balls[j]);
+                ResolveBallPair(balls[i], balls[j]);
 
     // Drop expired balls so the list can't grow forever over a long fight.
     balls.erase(std::remove_if(balls.begin(), balls.end(),
@@ -262,13 +265,13 @@ void BossState::updateBalls(float frames) {
 
 // One physics step for a single ball: gravity, then axis-separated bounces off
 // solid tiles / arena walls, then a spike bounce. `frames` scales to real time.
-void BossState::stepBall(Ball& b, float frames) {
+void BossState::StepBall(Ball& b, float frames) {
     b.vy += BALL_GRAVITY * frames;
 
     // ---- Horizontal move + bounce ----
     float prevX = b.x;
     b.x += b.vx * frames;
-    if (ballBlocked(b.x, b.y, b.radius)) {
+    if (BallBlocked(b.x, b.y, b.radius)) {
         b.x = prevX;
         b.vx = -b.vx * BALL_RESTITUTION;
     }
@@ -276,7 +279,7 @@ void BossState::stepBall(Ball& b, float frames) {
     // ---- Vertical move + bounce (floor / ceiling / tiles) ----
     float prevY = b.y;
     b.y += b.vy * frames;
-    if (ballBlocked(b.x, b.y, b.radius)) {
+    if (BallBlocked(b.x, b.y, b.radius)) {
         b.y = prevY;
         b.vy = -b.vy * BALL_RESTITUTION;
     }
@@ -291,7 +294,7 @@ void BossState::stepBall(Ball& b, float frames) {
 
 // Elastic collision between two balls of DIFFERENT mass. Separate them, then
 // apply the 1D elastic response along the line joining their centres.
-void BossState::resolveBallPair(Ball& a, Ball& b) {
+void BossState::ResolveBallPair(Ball& a, Ball& b) {
     float dx = b.x - a.x;
     float dy = b.y - a.y;
     float dist = sqrtf(dx * dx + dy * dy);
@@ -328,7 +331,7 @@ void BossState::resolveBallPair(Ball& a, Ball& b) {
     b.vx += (bnNew - bn) * nx;  b.vy += (bnNew - bn) * ny;
 }
 
-bool BossState::ballHitsPlayer(const Ball& b) const {
+bool BossState::BallHitsPlayer(const Ball& b) const {
     float hl, ht, hr, hb;
     player.GetWorldHitbox(hl, ht, hr, hb);
 
@@ -343,11 +346,11 @@ bool BossState::ballHitsPlayer(const Ball& b) const {
     hl -= padX;  hr += padX;
     ht -= padUp;               // the box bottom already sits near the feet
 
-    return circleVsBox(b.x, b.y, b.radius, hl, ht, hr, hb);
+    return CircleVsBox(b.x, b.y, b.radius, hl, ht, hr, hb);
 }
 
 // A ball's box hits a solid tile or leaves the arena (walls, ceiling, bottom).
-bool BossState::ballBlocked(float cx, float cy, float r) const {
+bool BossState::BallBlocked(float cx, float cy, float r) const {
     float left = cx - r;
     float right = cx + r;
     float top = cy - r;
@@ -362,7 +365,7 @@ bool BossState::ballBlocked(float cx, float cy, float r) const {
     return map.rectSolid(left, top, right, bottom);
 }
 
-bool BossState::circleVsBox(float cx, float cy, float r,
+bool BossState::CircleVsBox(float cx, float cy, float r,
                             float left, float top, float right, float bottom) {
     // Closest point on the box to the circle centre.
     float nx = cx < left ? left : (cx > right ? right : cx);

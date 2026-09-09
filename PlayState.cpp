@@ -10,14 +10,10 @@ void PlayState::Initialize(GameEngine* eng) {
 
     background.load(engine->GetGraphics());
 
-    // 1. Use the dynamic mapFile string instead of hardcoding Map1
     map.load(engine->GetGraphics(), mapFile.c_str());
 
     player.Initialize(engine->GetGraphics(), D3DXVECTOR2(300.0f, 400.0f));
 
-    // Items now live here (was ItemManager). Each sits on the floor (floor top =
-    // row 7). The ONLY thing that makes a mushroom differ from a tomato is the
-    // effect we inject here -- the Item class itself is generic.
     Graphics* gfx = engine->GetGraphics();
     float onFloor = 7.0f * TileMap::TILE - 64;   // 64px item resting on the floor
 

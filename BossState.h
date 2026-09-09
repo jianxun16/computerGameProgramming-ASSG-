@@ -36,15 +36,15 @@ private:
     };
 
     // --- Fight helpers ---
-    void  fireBallPair();                        // boss auto-fires two balls at the player
-    void  updateBalls(float frames);             // one physics step for every ball
-    void  stepBall(Ball& b, float frames);       // gravity + tile/wall/spike bounce
-    void  resolveBallPair(Ball& a, Ball& b);     // elastic ball-vs-ball collision
-    bool  ballHitsPlayer(const Ball& b) const;
-    bool  attackHitsBoss() const;                // player attack circle -> boss box
-    void  deflectBalls();                        // player attack knocks incoming balls away
-    bool  ballBlocked(float cx, float cy, float r) const;
-    static bool circleVsBox(float cx, float cy, float r,
+    void  FireBallPair();                        // boss auto-fires two balls at the player
+    void  UpdateBalls(float frames);             // one physics step for every ball
+    void  StepBall(Ball& b, float frames);       // gravity + tile/wall/spike bounce
+    void  ResolveBallPair(Ball& a, Ball& b);     // elastic ball-vs-ball collision
+    bool  BallHitsPlayer(const Ball& b) const;
+    bool  AttackHitsBoss() const;                // player attack circle -> boss box
+    void  DeflectBalls();                        // player attack knocks incoming balls away
+    bool  BallBlocked(float cx, float cy, float r) const;
+    static bool CircleVsBox(float cx, float cy, float r,
                             float left, float top, float right, float bottom);
 
     // Scene objects (value members, like PlayState).
