@@ -25,7 +25,6 @@
     <ClCompile Include="Background.cpp" />
     <ClCompile Include="BossState.cpp" />
     <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="Cheat.cpp" />
     <ClCompile Include="EndState.cpp" />
     <ClCompile Include="FrameTimer.cpp" />
     <ClCompile Include="ItemManager.cpp" />
@@ -53,7 +52,6 @@
     <ClInclude Include="Background.h" />
     <ClInclude Include="BossState.h" />
     <ClInclude Include="Camera.h" />
-    <ClInclude Include="Cheat.h" />
     <ClInclude Include="EndState.h" />
     <ClInclude Include="FrameTimer.h" />
     <ClInclude Include="GameLog.h" />
@@ -74,6 +72,9 @@
     <ClInclude Include="SettingState.h" />
     <ClInclude Include="StateManager.h" />
     <ClInclude Include="TileMap.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>18.0</VCProjectVersion>

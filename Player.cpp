@@ -1,4 +1,11 @@
 #include "Player.h"
+#include "GameLog.h"
+#include <conio.h>   // _kbhit / _getche (non-blocking console input)
+#include <string>
+#include <cctype>
+
+// One shared god-mode flag for the whole game (see the note in Player.h).
+bool Player::godMode = false;
 
 Player::Player() {
     spriteSheet = nullptr;
@@ -46,6 +53,39 @@ void Player::ChangeState(AnimState newState) {
     currentState = newState;
     anim.SetTrack((int)newState);
     anim.Reset();   // snap to frame 0 so the new animation starts clean
+}
+
+void Player::PollCheat() {
+    // Drain everything typed since last frame (non-blocking, so the game keeps
+    // running whether or not the console window has focus). When the typed line
+    // matches the cheat code, flip god mode.
+    static std::string  buffer;             // characters typed so far this line
+    const char* const   CHEAT_CODE = "idkfa";
+
+    while (_kbhit()) {
+        int ch = _getche();   // echo, so the typed code is visible
+
+        if (ch == '\r' || ch == '\n') {         // Enter -> check the line
+            std::string typed = buffer;
+            for (size_t i = 0; i < typed.size(); i++)
+                typed[i] = (char)tolower((unsigned char)typed[i]);
+
+            if (typed == CHEAT_CODE) {
+                godMode = !godMode;
+                GameLog(godMode ? "CHEAT MODE ON  (god mode: you can't die)"
+                                : "CHEAT MODE OFF");
+            }
+            buffer.clear();
+        }
+        else if (ch == '\b') {                  // backspace
+            if (!buffer.empty()) buffer.pop_back();
+        }
+        else if (ch >= 32 && ch < 127) {        // printable char
+            buffer.push_back((char)ch);
+            if (buffer.size() > 32)             // keep the buffer small
+                buffer.erase(0, buffer.size() - 32);
+        }
+    }
 }
 
 void Player::UpdateLogic(Input* input, float deltaTime, AudioManager* audio) {

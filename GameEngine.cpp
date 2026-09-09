@@ -1,5 +1,5 @@
 #include "GameEngine.h"
-#include "Cheat.h"
+#include "Player.h"
 #include <iostream>
 
 using namespace std;
@@ -61,7 +61,7 @@ void GameEngine::Run() {
     while (window.ProcessMessages()) {
 
         // cheat console: type "idkfa" + Enter in the console window to toggle god mode
-        Cheat::pollConsole();
+        Player::PollCheat();
 
         int ticks = timer.FrameToUpdate();
 

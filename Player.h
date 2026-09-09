@@ -46,6 +46,11 @@ private:
 
     void ChangeState(AnimState newState);
 
+    // God-mode flag. static = ONE flag shared by every Player object, so the
+    // cheat stays on when you move from the level to the boss room (each state
+    // owns its own Player). It's class-level state, not per-object state.
+    static bool godMode;
+
 public:
     Player();
     ~Player();
@@ -73,4 +78,11 @@ public:
     // planted, and the collider box scales with it.
     void  SetScale(float s);
     float GetScale() const { return charScale; }
+
+    // ---- Cheat / god mode (was the old Cheat.h/.cpp) ----
+    // Click the console window, type the cheat code ("idkfa") + Enter to toggle
+    // GOD MODE on/off. While it's on the player can't be killed (spikes, the pit
+    // and boss balls are all ignored).
+    static void PollCheat();                    // call once per frame: read the console
+    bool IsGodMode() const { return godMode; }  // queried by the gameplay states
 };

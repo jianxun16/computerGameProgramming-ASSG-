@@ -3,7 +3,6 @@
 #include "PauseState.h"
 #include "BossState.h"
 #include "EndState.h"
-#include "Cheat.h"
 #include "GameLog.h"
 
 void PlayState::Initialize(GameEngine* eng) {
@@ -66,7 +65,7 @@ void PlayState::UpdateLogic(Input* input, float deltaTime) {
     player.GetWorldHitbox(hl, ht, hr, hb);
     bool fell = player.GetFeetY() > TileMap::ROWS * TileMap::TILE;
     bool spiked = map.rectSpike(hl, ht, hr, hb);
-    if ((fell || spiked) && !Cheat::enabled()) {
+    if ((fell || spiked) && !player.IsGodMode()) {
         GameLog(fell ? "Player fell into the pit -> Game Over"
                      : "Player hit a spike -> Game Over");
         engine->GetAudio()->StopBGM();

@@ -2,7 +2,6 @@
 #include "GameEngine.h"
 #include "PauseState.h"
 #include "EndState.h"
-#include "Cheat.h"
 #include "GameLog.h"
 #include <math.h>
 #include <algorithm>
@@ -99,7 +98,7 @@ void BossState::UpdateLogic(Input* input, float deltaTime) {
     player.GetWorldHitbox(hl, ht, hr, hb);
 
     // Player walked into a spike -> LOSE (skipped in cheat / god mode).
-    if (!Cheat::enabled() && map.rectSpike(hl, ht, hr, hb)) {
+    if (!player.IsGodMode() && map.rectSpike(hl, ht, hr, hb)) {
         GameLog("Player hit a spike in the boss room -> Game Over");
         engine->GetAudio()->StopBGM();
         engine->GetStateManager()->PushState(new EndState(EndState::RESULT_LOSE));
@@ -134,7 +133,7 @@ void BossState::UpdateLogic(Input* input, float deltaTime) {
     deflectBalls();
 
     // A boss ball touched the player -> LOSE (skipped in cheat / god mode).
-    if (!Cheat::enabled()) {
+    if (!player.IsGodMode()) {
         for (size_t i = 0; i < balls.size(); i++) {
             if (balls[i].alive && ballHitsPlayer(balls[i])) {
                 GameLog("A boss ball hit the player -> Game Over");
