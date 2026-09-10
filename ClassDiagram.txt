@@ -1,0 +1,589 @@
+========================================================================
+ CLASS DIAGRAM - MEMBERS FROM ALL HEADER FILES
+ (variables + functions only, no relationships/arrows)
+========================================================================
+
+Visibility legend / 符号说明:
+  +  public
+  -  private
+  #  protected
+
+Notes:
+  [static]   = static member
+  [virtual]  = virtual function
+  [pure]     = pure virtual (= 0), abstract
+  [override] = overrides a base-class virtual
+  [const]    = const member function
+Format: symbol name(params) : returnType
+
+
+========================================================================
+ AssetManager
+========================================================================
+Variables:
+  - textures : map<string, LPDIRECT3DTEXTURE9>
+Functions:
+  + GetTexture(device : IDirect3DDevice9*, path : string) : LPDIRECT3DTEXTURE9
+  + CleanUpAssets() : void
+
+
+========================================================================
+ Background
+========================================================================
+Variables:
+  + NUM_LAYERS : int = 4                                [static const]
+  - layerTexture[NUM_LAYERS] : LPDIRECT3DTEXTURE9
+  - parallaxFactor[NUM_LAYERS] : float
+  - sourceSize : int
+  - scale : float
+  - layerSprite : Sprite
+Functions:
+  + Background()
+  + ~Background()
+  + load(graphics : Graphics*) : bool
+  + render(graphics : Graphics*, camera : Camera*) : void
+  + release() : void
+  - drawLayer(graphics : Graphics*, cameraX : float, i : int) : void
+
+
+========================================================================
+ BossState  (: public GameState)
+========================================================================
+Nested struct Ball:
+    float x, y, vx, vy, radius, scale, mass, life;  bool alive;
+Variables:
+  - map : TileMap
+  - background : Background
+  - player : Player
+  - bossTex : LPDIRECT3DTEXTURE9
+  - ballTex : LPDIRECT3DTEXTURE9
+  - bossX, bossY : float
+  - bossW, bossH : float
+  - ballW, ballH : float
+  - bossAlive : bool
+  - ended : bool
+  - fireTimer : float
+  - balls : vector<Ball>
+Functions:
+  + BossState()
+  + Initialize(eng : GameEngine*) : void                                 [override]
+  + Resume() : void                                                      [override]
+  + UpdateLogic(input : Input*, deltaTime : float) : void                [override]
+  + RenderFrame(graphics : Graphics*) : void                            [override]
+  - fireBallPair() : void
+  - updateBalls(frames : float) : void
+  - stepBall(b : Ball&, frames : float) : void
+  - resolveBallPair(a : Ball&, b : Ball&) : void
+  - ballHitsPlayer(b : const Ball&) : bool                              [const]
+  - attackHitsBoss() : bool                                            [const]
+  - deflectBalls() : void
+  - ballBlocked(cx : float, cy : float, r : float) : bool               [const]
+  - circleVsBox(cx,cy,r,left,top,right,bottom : float) : bool           [static]
+
+
+========================================================================
+ Camera
+========================================================================
+Variables:
+  - position : D3DXVECTOR2
+  - screenWidth : int
+  - screenHeight : int
+  - viewMatrix : D3DXMATRIX
+Functions:
+  + Camera(width : int, height : int)
+  + SetPosition(newPos : D3DXVECTOR2) : void
+  + Move(delta : D3DXVECTOR2) : void
+  + GetPosition() : D3DXVECTOR2                                         [const]
+  + Update() : void
+  + GetViewMatrix() : D3DXMATRIX                                        [const]
+  + ScreenToWorld(screenPos : D3DXVECTOR2) : D3DXVECTOR2
+
+
+========================================================================
+ EndState  (: public GameState)
+========================================================================
+Nested enum Result { RESULT_WIN, RESULT_LOSE }
+Variables:
+  - result : Result
+  - menuX, menuY, menuW, menuH : float
+Functions:
+  + EndState(result : Result)
+  + Initialize(eng : GameEngine*) : void                                [override]
+  + UpdateLogic(input : Input*, deltaTime : float) : void               [override]
+  + RenderFrame(graphics : Graphics*) : void                           [override]
+  - PointInRect(px,py : int, x,y,w,h : float) : bool                    [static]
+
+
+========================================================================
+ FrameTimer
+========================================================================
+Variables:
+  - timerFreq : LARGE_INTEGER
+  - timeNow : LARGE_INTEGER
+  - timePrevious : LARGE_INTEGER
+  - requestedFPS : int
+  - intervalsPerFrame : float
+  - intervalsSinceLastUpdate : float
+  - framesToUpdate : int
+Functions:
+  + Init(fps : int) : void
+  + FrameToUpdate() : int
+
+
+========================================================================
+ GameEngine
+========================================================================
+Variables:
+  - window : GameWindow
+  - graphics : Graphics
+  - input : Input
+  - audio : AudioManager
+  - assets : AssetManager
+  - timer : FrameTimer
+  - camera : Camera*
+  - stateManager : StateManager
+  - screenWidth : int
+  - screenHeight : int
+  - requestedFPS : int
+Functions:
+  + GameEngine()
+  + ~GameEngine()
+  + Initialize(hInst : HINSTANCE, width : int, height : int, fullscreen : bool, fps : int) : bool
+  + Run() : void
+  + Shutdown() : void
+  + GetWindow() : GameWindow*
+  + GetGraphics() : Graphics*
+  + GetInput() : Input*
+  + GetAudio() : AudioManager*
+  + GetAssets() : AssetManager*
+  + GetCamera() : Camera*
+  + GetStateManager() : StateManager*
+  + GetScreenWidth() : int                                              [const]
+  + GetScreenHeight() : int                                             [const]
+  + GetFPS() : int                                                      [const]
+
+
+========================================================================
+ GameState   (abstract base class)
+========================================================================
+Variables:
+  + engine : GameEngine*
+Functions:
+  + ~GameState()                                                        [virtual]
+  + Initialize(eng : GameEngine*) : void                                [virtual]
+  + Pause() : void                                                      [virtual]
+  + Resume() : void                                                     [virtual]
+  + UpdateLogic(input : Input*, deltaTime : float) : void               [pure]
+  + RenderFrame(graphics : Graphics*) : void                            [pure]
+
+
+========================================================================
+ GameWindow
+========================================================================
+Variables:
+  - hWnd : HWND
+  - hInstance : HINSTANCE
+  - d3d : IDirect3D9*
+  - d3dDevice : IDirect3DDevice9*
+  - d3dPP : D3DPRESENT_PARAMETERS
+Functions:
+  - WindowProc(hWnd : HWND, message : UINT, wParam : WPARAM, lParam : LPARAM) : LRESULT   [static]
+  + InitializeWindow(hInst : HINSTANCE, width : int, height : int, fullscreen : bool) : bool
+  + ProcessMessages() : bool
+  + CleanUpWindow() : void
+  + GetWindowHandle() : HWND                                            [const]
+  + GetD3DDevice() : IDirect3DDevice9*                                  [const]
+
+
+========================================================================
+ Graphics
+========================================================================
+Variables:
+  - device : IDirect3DDevice9*
+  - spriteBrush : LPD3DXSPRITE
+  - lineBrush : LPD3DXLINE
+  - fontBrush : LPD3DXFONT
+  - whiteTex : LPDIRECT3DTEXTURE9
+Functions:
+  + InitializeGraphics(d3dDevice : IDirect3DDevice9*) : bool
+  + CleanUpGraphics() : void
+  + LoadTexture(path : string) : LPDIRECT3DTEXTURE9
+  + LoadFont(fontName : string, size : int, weight : int) : bool
+  + BeginRender(r : int, g : int, b : int) : void
+  + DrawSprite(texture : LPDIRECT3DTEXTURE9, srcRect : RECT*, transform : D3DXMATRIX*, color : D3DCOLOR) : void
+  + DrawString(text : string, rect : RECT*, alignment : DWORD, color : D3DCOLOR) : void
+  + DrawLine(from : D3DXVECTOR2, to : D3DXVECTOR2, width : float, color : D3DCOLOR) : void
+  + DrawRect(x : float, y : float, w : float, h : float, color : D3DCOLOR) : void
+  + EndRender() : void
+
+
+========================================================================
+ MenuState  (: public GameState)
+========================================================================
+Nested struct Button { RECT rect; const char* label; }
+Variables:
+  - background : LPDIRECT3DTEXTURE9
+  - buttonTex : LPDIRECT3DTEXTURE9
+  - bgSprite : Sprite
+  - buttonSprite : Sprite
+  - playBtn : Button
+  - settingBtn : Button
+  - exitBtn : Button
+  - btnW : float
+  - btnH : float
+Functions:
+  - LayoutButtons(screenW : float, screenH : float) : void
+  - PointInRect(px : int, py : int, r : const RECT&) : bool
+  - DrawButton(graphics : Graphics*, b : const Button&, hovered : bool) : void
+  + Initialize(eng : GameEngine*) : void                                [override]
+  + UpdateLogic(input : Input*, deltaTime : float) : void               [override]
+  + RenderFrame(graphics : Graphics*) : void                           [override]
+
+
+========================================================================
+ PauseState  (: public GameState)
+========================================================================
+Nested struct Slider { float x, y, w, h, value; bool dragging; }
+Variables:
+  - bgm : Slider
+  - sfx : Slider
+  - continueX, continueY, continueW, continueH : float
+  - menuX, menuY, menuW, menuH : float
+Functions:
+  - PointInRect(px,py : int, x,y,w,h : float) : bool
+  - NearTrack(px : int, py : int, s : const Slider&) : bool
+  + Initialize(eng : GameEngine*) : void                                [override]
+  + UpdateLogic(input : Input*, deltaTime : float) : void               [override]
+  + RenderFrame(graphics : Graphics*) : void                           [override]
+
+
+========================================================================
+ Physics
+========================================================================
+Variables:
+  (none)
+Functions:
+  + CheckCollision(a : PhysicsObject*, b : PhysicsObject*) : bool               [static]
+  + ResolveElasticCollision(a : PhysicsObject*, b : PhysicsObject*) : void      [static]
+  - CircleVsCircle(a : PhysicsObject*, b : PhysicsObject*) : bool               [static]
+  - BoxVsBox(a : PhysicsObject*, b : PhysicsObject*) : bool                     [static]
+  - CircleVsBox(circle : PhysicsObject*, box : PhysicsObject*) : bool           [static]
+
+
+========================================================================
+ SettingState  (: public GameState)
+========================================================================
+Nested struct Slider { float x, y, w, h, value; bool dragging; }
+Variables:
+  - bgm : Slider
+  - sfx : Slider
+  - exitX, exitY, exitW, exitH : float
+Functions:
+  - PointInRect(px,py : int, x,y,w,h : float) : bool
+  - NearTrack(px : int, py : int, s : const Slider&) : bool
+  + Initialize(eng : GameEngine*) : void                                [override]
+  + UpdateLogic(input : Input*, deltaTime : float) : void               [override]
+  + RenderFrame(graphics : Graphics*) : void                           [override]
+
+
+========================================================================
+ Sprite
+========================================================================
+Variables:
+  - texture : LPDIRECT3DTEXTURE9
+  - sourceRect : RECT
+  - useSourceRect : bool
+  - origin : D3DXVECTOR2
+Functions:
+  - BuildTransform(position : D3DXVECTOR2, scale : D3DXVECTOR2, rotation : float) : D3DXMATRIX
+  + Sprite()
+  + Sprite(tex : LPDIRECT3DTEXTURE9)                                    [explicit]
+  + SetTexture(tex : LPDIRECT3DTEXTURE9) : void
+  + GetTexture() : LPDIRECT3DTEXTURE9                                   [const]
+  + IsValid() : bool                                                    [const]
+  + SetSourceRect(rect : const RECT&) : void
+  + ClearSourceRect() : void
+  + SetOrigin(x : float, y : float) : void
+  + CenterOrigin() : void
+  + Draw(graphics : Graphics*, camera : Camera*, position : D3DXVECTOR2, scale : D3DXVECTOR2, rotation : float, color : D3DCOLOR) : void
+  + DrawScreen(graphics : Graphics*, position : D3DXVECTOR2, scale : D3DXVECTOR2, rotation : float, color : D3DCOLOR) : void
+
+
+========================================================================
+ StateManager
+========================================================================
+Nested enum PendingType { P_PUSH, P_POP, P_CHANGE, P_POPBOTTOM }
+Nested struct Pending { PendingType type; GameState* state; }
+Variables:
+  - engine : GameEngine*
+  - stateStack : vector<GameState*>
+  - pending : vector<Pending>
+Functions:
+  + StateManager()
+  + SetEngine(eng : GameEngine*) : void
+  + PushState(state : GameState*) : void
+  + PopState() : void
+  + ChangeState(state : GameState*) : void
+  + PopToBottom() : void
+  + ApplyPendingTransitions() : void
+  + GetActiveState() : GameState*
+  + RenderAll(graphics : Graphics*) : void
+  + CleanUpStates() : void
+
+
+========================================================================
+ AnimationController
+========================================================================
+(enum class CycleDirection { LeftToRight, RightToLeft, TopToBottom, BottomToTop })
+Variables:
+  - frameWidth : int
+  - frameHeight : int
+  - maxCols : int
+  - maxRows : int
+  - currentFrame : int
+  - totalFrames : int
+  - activeTrack : int
+  - timePerFrame : float
+  - timer : float
+  - direction : CycleDirection
+Functions:
+  + Initialize(texWidth : int, texHeight : int, cols : int, rows : int, frames : int, speed : float, dir : CycleDirection) : void
+  + Update(deltaTime : float) : void
+  + Reset() : void
+  + SetTrack(trackIndex : int) : void
+  + SetDirection(dir : CycleDirection) : void
+  + GetCurrentFrame() : int                                             [const]
+  + GetSourceRect() : RECT                                              [const]
+
+
+========================================================================
+ Input
+========================================================================
+Variables:
+  - dInput : LPDIRECTINPUT8
+  - keyboard : LPDIRECTINPUTDEVICE8
+  - mouse : LPDIRECTINPUTDEVICE8
+  - keys[256] : BYTE
+  - prevKeys[256] : BYTE
+  - mouseState : DIMOUSESTATE
+  - prevMouseState : DIMOUSESTATE
+  - hWnd : HWND
+  - mouseX, mouseY : int
+Functions:
+  + Input()
+  + InitializeInput(hInstance : HINSTANCE, hWnd : HWND) : bool
+  + PollDeviceStates() : void
+  + CleanUpInput() : void
+  + IsKeyDown(dikCode : int) : bool
+  + IsKeyJustPressed(dikCode : int) : bool
+  + GetMouseX() : int
+  + GetMouseY() : int
+  + GetMouseDX() : long                                                 [const]
+  + GetMouseDY() : long                                                 [const]
+  + IsMouseButtonDown(button : int) : bool
+  + IsMouseButtonJustPressed(button : int) : bool
+
+
+========================================================================
+ TileMap
+========================================================================
+Constants / enum:
+  + TILE : int = 64                                                     [static const]
+  + ROWS : int = 12                                                     [static const]
+  + COLS : int = 28                                                     [static const]
+  + enum { EMPTY=0, GRASS=1, ROCK=2, SPIKE=5 }
+Variables:
+  - tiles[ROWS][COLS] : int
+  - grassTex : LPDIRECT3DTEXTURE9
+  - rockTex : LPDIRECT3DTEXTURE9
+  - spikeTex : LPDIRECT3DTEXTURE9
+  - grassSprite : Sprite
+  - rockSprite : Sprite
+  - spikeSprite : Sprite
+Functions:
+  + TileMap()
+  + ~TileMap()
+  + load(graphics : Graphics*, mapFile : const char*) : bool
+  + render(graphics : Graphics*, camera : Camera*, screenWidth : int) : void
+  + release() : void
+  + rectSolid(left,top,right,bottom : float) : bool                     [const]
+  + rectSpike(left,top,right,bottom : float) : bool                     [const]
+  + groundTopYAt(worldX : float) : float                               [const]
+  - solid(col : int, row : int) : bool                                  [const]
+
+
+========================================================================
+ AudioManager
+========================================================================
+Nested enum SoundType { SFX, BGM }
+Variables:
+  - system : FMOD::System*
+  - soundMap : unordered_map<string, FMOD::Sound*>
+  - channel : FMOD::Channel*
+  - bgmChannel : FMOD::Channel*
+  - bgmGroup : FMOD::ChannelGroup*
+  - sfxGroup : FMOD::ChannelGroup*
+  - result : FMOD_RESULT
+  - bgmVolume : float
+  - sfxVolume : float
+Functions:
+  + AudioManager()
+  + InitializeAudio() : void
+  + LoadSound(key : const string&, filePath : const string&, isStream : bool, loop : bool) : void
+  + Play(key : const string&, type : SoundType) : void
+  + PlayPitchSFX(key : const string&, pitch : float) : void
+  + PlaySFXAt(key : const string&, listenerX,listenerY,sourceX,sourceY,minDist,maxDist : float) : void
+  + StopBGM() : void
+  + SetMusicVolume(v : float) : void
+  + SetSFXVolume(v : float) : void
+  + GetMusicVolume() : float                                            [const]
+  + GetSFXVolume() : float                                              [const]
+  + UpdateSound() : void
+  + CleanUpAudio() : void
+
+
+========================================================================
+ PhysicsObject  (: public GameObject)
+========================================================================
+(enum class ColliderType { CIRCLE, BOX })
+Variables:
+  - velocity : D3DXVECTOR2
+  - acceleration : D3DXVECTOR2
+  - force : D3DXVECTOR2
+  - mass : float
+  - bounciness : float
+  - friction : float
+  - gravityScale : float
+  - colliderShape : ColliderType
+  - boxWidth : float
+  - boxHeight : float
+  - radius : float
+Functions:
+  + PhysicsObject()
+  + ~PhysicsObject()                                                    [virtual]
+  + InitializePhysics(mass : float, bounce : float, drag : float, gScale : float) : void
+  + ApplyForce(appliedForce : D3DXVECTOR2) : void
+  + ApplyGravity(gravity : D3DXVECTOR2) : void
+  + UpdateLogic(deltaTime : float) : void                               [override]
+  + GetVelocity() : D3DXVECTOR2                                         [const]
+  + SetVelocity(vel : D3DXVECTOR2) : void
+  + SetMass(m : float) : void
+  + SetBounciness(b : float) : void
+  + SetFriction(f : float) : void
+  + SetColliderCircle(r : float) : void
+  + SetColliderBox(w : float, h : float) : void
+  + GetMass() : float                                                   [const]
+  + GetBounciness() : float                                             [const]
+  + GetFriction() : float                                               [const]
+  + GetColliderShape() : ColliderType                                   [const]
+  + GetBoxWidth() : float                                               [const]
+  + GetBoxHeight() : float                                              [const]
+  + GetRadius() : float                                                 [const]
+
+
+========================================================================
+ Player  (: public PhysicsObject)
+========================================================================
+Nested struct AnimBlock { int startCol, startRow, cols, count; }
+Nested enum AnimState { IDLE=0, RUN=1, ATTACK=2 }
+Variables:
+  - anim : AnimationController
+  - spriteSheet : LPDIRECT3DTEXTURE9
+  - sprite : Sprite
+  - idleAnim : AnimBlock
+  - runAnim : AnimBlock
+  - attackAnim : AnimBlock
+  - moveSpeed : float
+  - jumpForce : float
+  - isJumping : bool
+  - facingLeft : bool
+  - isAttacking : bool
+  - attackTimer : float
+  - BASE_BOX_W : int = 32                                               [static const]
+  - BASE_BOX_H : int = 64                                               [static const]
+  - charScale : float
+  - spriteOffset : D3DXVECTOR2
+  - currentState : AnimState
+  - godMode : bool                                                      [static]
+Functions:
+  - ChangeState(newState : AnimState) : void
+  + Player()
+  + ~Player()
+  + Initialize(graphics : Graphics*, startPos : D3DXVECTOR2) : void
+  + UpdateLogic(input : Input*, deltaTime : float, audio : AudioManager*) : void
+  + ResolveMapCollisions(map : TileMap*) : void
+  + RenderFrame(graphics : Graphics*, camera : Camera*) : void
+  + GetFeetY() : float                                                  [const]
+  + GetFeetWorldX() : float                                             [const]
+  + GetWorldHitbox(left : float&, top : float&, right : float&, bottom : float&) : void   [const]
+  + GetAttackCircleWorld(centre : D3DXVECTOR2&, radius : float&) : bool                   [const]
+  + SetScale(s : float) : void
+  + GetScale() : float                                                  [const]
+  + PollCheat() : void                                                  [static]
+  + IsGodMode() : bool                                                  [const]
+
+
+========================================================================
+ GameObject
+========================================================================
+Variables:
+  # position : D3DXVECTOR2
+  # scale : D3DXVECTOR2
+  # rotation : float
+  # spriteWidth : int
+  # spriteHeight : int
+  # texture : LPDIRECT3DTEXTURE9
+  # animator : AnimationController
+  # isAnimated : bool
+  # sprite : Sprite
+  # active : bool
+Functions:
+  + GameObject()
+  + ~GameObject()                                                       [virtual]
+  + Initialize(tex : LPDIRECT3DTEXTURE9, startPos : D3DXVECTOR2, width : int, height : int) : void   [virtual]
+  + SetupAnimation(texWidth : int, texHeight : int, cols : int, rows : int, frames : int, speed : float, dir : CycleDirection) : void   [virtual]
+  + UpdateLogic(deltaTime : float) : void                               [virtual]
+  + RenderFrame(graphics : Graphics*, camera : Camera*) : void          [virtual]
+  + GetPosition() : D3DXVECTOR2                                         [const]
+  + SetPosition(pos : D3DXVECTOR2) : void
+  + GetWidth() : int                                                    [const]
+  + GetHeight() : int                                                   [const]
+  + GetAnimator() : AnimationController*
+  + IsActive() : bool                                                   [const]
+  + SetActive(state : bool) : void
+
+
+========================================================================
+ PlayState  (: public GameState)
+========================================================================
+Nested struct Item:
+    Sprite sprite; float x, y; int size; bool active;
+    std::function<void(Player&)> effect;
+    + ApplyEffect(player : Player&) : void
+    + Overlaps(pl, pt, pr, pb : float) : bool   [const]
+    + render(graphics : Graphics*, camera : Camera*) : void
+Variables:
+  - map : TileMap
+  - background : Background
+  - mapFile : string
+  - bgm : string
+  - player : Player
+  - itemList : vector<Item>
+  - enteredBoss : bool
+Functions:
+  + PlayState(mapPath : string, bgmName : string)
+  + Initialize(eng : GameEngine*) : void                                [override]
+  + Resume() : void                                                     [override]
+  + UpdateLogic(input : Input*, deltaTime : float) : void               [override]
+  + RenderFrame(graphics : Graphics*) : void                           [override]
+
+
+========================================================================
+ GameLog.h  (NOT a class - free helper function)
+========================================================================
+Functions:
+  GameLog(fmt : const char*, ...) : void                                [inline, global]
+
+========================================================================
+ END
+========================================================================

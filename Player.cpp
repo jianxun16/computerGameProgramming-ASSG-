@@ -28,7 +28,7 @@ Player::Player() {
 }
 
 Player::~Player() {
-    // Let the AssetManager or Graphics wrapper handle texture cleanup to prevent double-deletes
+    spriteSheet->Release();
 }
 
 void Player::Initialize(Graphics* graphics, D3DXVECTOR2 startPos) {
